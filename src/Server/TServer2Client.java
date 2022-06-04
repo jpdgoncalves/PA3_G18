@@ -2,15 +2,17 @@ package Server;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class TServer2Client extends Thread{
 
-    String request;
-    int nr_iterations;
-    String ip_client;
-    int port_client;
-    int timePerIteration;
+    private String request;
+    private int nr_iterations;
+    private String ip_client;
+    private int port_client;
+    private int timePerIteration;
+    private Socket s;
 
     /**
      * Constructor
@@ -25,6 +27,13 @@ public class TServer2Client extends Thread{
         this.ip_client = "127.0.0.1";
         this.port_client = 8080;
         this.timePerIteration = 1000;
+
+        //create socket
+        try {
+            s = new Socket(ip_client, port_client);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -53,26 +62,27 @@ public class TServer2Client extends Thread{
      * @param port_client Port of the client
      * @param answer Value of pi to send
      */
-    private void sendInfo(String ip_client, int port_client, String answer) {
-
-        Socket socket = null;
-        DataOutputStream out = null;
+    private void sendInfo(String answer) {
 
         try {
-            //creates the connection
-            socket = new Socket(ip_client, port_client);
-            System.out.println("Connected");
+            ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+            out.writeObject(answer);
 
-            // sends output to the socket
-            out  = new DataOutputStream(socket.getOutputStream());
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
 
-            out.close();
-            socket.close();
+    }
 
+    /**
+     * TODO - not working, killing client as well
+     */
+    private void terminateServer() {
+        try {
+            s.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     /**
@@ -84,11 +94,18 @@ public class TServer2Client extends Thread{
         //process requests
         String answer = getPi(nr_iterations, timePerIteration);
         //sends info to client
-        sendInfo(ip_client, port_client, answer);
+        sendInfo(answer);
 
         System.out.println("Kill thread");
 
+        //TODO - end connection, killing client as well
+        //terminateServer();
+
+
+
     }
+
+
 
 
 }

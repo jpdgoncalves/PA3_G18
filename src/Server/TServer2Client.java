@@ -1,5 +1,7 @@
 package Server;
 
+import Request.Request;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -7,7 +9,7 @@ import java.net.Socket;
 
 public class TServer2Client extends Thread{
 
-    private String request;
+    private Request request;
     private int nr_iterations;
     private String ip_client;
     private int port_client;
@@ -19,14 +21,17 @@ public class TServer2Client extends Thread{
      *
      * @param request Request that will be processed
      */
-    public TServer2Client(String request){
+    public TServer2Client(Request request){
         this.request = request;
 
-        //TODO get these params from the request
-        this.nr_iterations = 2;
+
+        this.nr_iterations = request.getNr_iterations();
+
+        //TODO get these params somehow
         this.ip_client = "127.0.0.1";
         this.port_client = 8080;
-        this.timePerIteration = 1000;
+
+        this.timePerIteration = request.getTimePerIteration();
 
         //create socket
         try {
@@ -58,8 +63,6 @@ public class TServer2Client extends Thread{
     /**
      * Sends the answer obtained to the client that made the request, via TCP/IP socket.
      *
-     * @param ip_client IP of the client
-     * @param port_client Port of the client
      * @param answer Value of pi to send
      */
     private void sendInfo(String answer) {
@@ -91,14 +94,16 @@ public class TServer2Client extends Thread{
     @Override
     public void run() {
         System.out.println("Server to client begins !");
+
         //process requests
         String answer = getPi(nr_iterations, timePerIteration);
+
         //sends info to client
         sendInfo(answer);
 
         System.out.println("Kill thread");
 
-        //TODO - end connection, killing client as well
+        //TODO - end connection, err killing client as well
         //terminateServer();
 
 

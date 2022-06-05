@@ -1,5 +1,7 @@
 package Server;
 
+import Request.Request;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -11,19 +13,16 @@ public class Server {
     /**
      * Blocking queue for the requests
      */
-    static BlockingQueue<String> request_list;
+    static BlockingQueue<Request> request_list;
 
     static Boolean stillRunning = true;
 
-
-
-
-    public boolean addRequest (String request){
+    public boolean addRequest (Request request){
 
         return request_list.add(request);
     }
 
-    public static String getRequest(){
+    public static Request getRequest(){
         try {
             return request_list.take();
         } catch (InterruptedException e) {
@@ -48,7 +47,8 @@ public class Server {
 
         //Create and run a String2Client thread
         //String request = getRequest();
-        String request = "69";
+        Request request = new Request(1,1,1,1,3,0,0, 1000);
+
         TServer2Client stc = new TServer2Client(request);
         stc.run();
 

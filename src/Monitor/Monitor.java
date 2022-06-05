@@ -13,27 +13,27 @@ public class Monitor {
         while (true)
         // running infinite loop
         {
-            Socket mynewSocket = null;
+            Socket socket = null;
 
             try
             {
-                // mynewSocket object to receive incoming client requests
-                mynewSocket = myserverSocket.accept();
+                // socket object to receive incoming client requests
+                socket = myserverSocket.accept();
 
-                System.out.println("A new connection identified : " + mynewSocket);
+                System.out.println("A new connection identified : " + socket);
                 // obtaining input and out streams
-                DataInputStream ournewDataInputstream = new DataInputStream(mynewSocket.getInputStream());
-                DataOutputStream ournewDataOutputstream = new DataOutputStream(mynewSocket.getOutputStream());
+                DataInputStream ournewDataInputstream = new DataInputStream(socket.getInputStream());
+                DataOutputStream ournewDataOutputstream = new DataOutputStream(socket.getOutputStream());
 
                 System.out.println("Thread assigned");
 
-                Thread myThread = new TLoadBalancerHandler(mynewSocket, ournewDataInputstream, ournewDataOutputstream);
+                Thread myThread = new TLoadBalancerHandler(socket, ournewDataInputstream, ournewDataOutputstream);
                 // starting
                 myThread.start();
 
             }
             catch (Exception e){
-                mynewSocket.close();
+                socket.close();
                 e.printStackTrace();
             }
         }

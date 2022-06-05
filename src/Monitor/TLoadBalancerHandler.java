@@ -26,9 +26,6 @@ public class TLoadBalancerHandler extends Thread{
         while (true)
         {
             try {
-
-                // getting answers from client
-//                System.out.println("going to receive an answer");
                 receivedString = ournewDataInputstream.readUTF();
                 System.out.println("received :: "+ receivedString);
                 ournewDataOutputstream.writeUTF("Received from LB : " + receivedString);
@@ -46,6 +43,7 @@ public class TLoadBalancerHandler extends Thread{
                 ournewDataOutputstream.writeUTF(stringToReturn);
 
             } catch (IOException e) {
+                System.out.println("Problem inside handler LB !!");
                 e.printStackTrace();
             }
         }
@@ -55,7 +53,6 @@ public class TLoadBalancerHandler extends Thread{
             // closing resources
             this.ournewDataInputstream.close();
             this.ournewDataOutputstream.close();
-
         }catch(IOException e){
             e.printStackTrace();
         }

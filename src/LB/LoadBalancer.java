@@ -7,25 +7,21 @@ public class LoadBalancer {
 
     public static void main(String[] args) throws IOException
     {
-        Socket ournewsocket = null;
+        Socket socket = null;
         try
         {
             // establishing the connection
-            ournewsocket = new Socket("localhost",5056);
+            socket = new Socket("localhost",5056);
             System.out.println("connection established");
-            DataInputStream ournewDataInputstream = new DataInputStream(ournewsocket.getInputStream());
-            DataOutputStream ournewDataOutputstream = new DataOutputStream(ournewsocket.getOutputStream());
-            // In the following loop, the client and client handle exchange data.
-            while (true)
-            {
-//                System.out.println(ournewDataInputstream.readUTF());
-                Thread monitor = new TMonitorHandler(ournewsocket, ournewDataOutputstream, ournewDataInputstream);
-                monitor.start();
+            DataInputStream dis = new DataInputStream(socket.getInputStream());
+            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
 
-            }
+            Thread monitor = new TMonitorHandler(socket, dos, dis);
+            monitor.start();
+
 
         }catch(Exception e){
-            ournewsocket.close();
+            socket.close();
             e.printStackTrace();
         }
     }

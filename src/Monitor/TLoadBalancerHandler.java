@@ -28,7 +28,9 @@ public class TLoadBalancerHandler extends Thread{
             try {
 
                 // getting answers from client
+//                System.out.println("going to receive an answer");
                 receivedString = ournewDataInputstream.readUTF();
+                System.out.println("received :: "+ receivedString);
                 ournewDataOutputstream.writeUTF("Received from LB : " + receivedString);
 
                 if(receivedString.equals("Exit"))

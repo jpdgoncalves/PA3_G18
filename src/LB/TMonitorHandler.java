@@ -1,22 +1,17 @@
 package LB;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class TMonitorHandler extends Thread{
     private Socket socket;
-    private ObjectOutputStream out;
-    private ObjectInputStream in;
-    private ServerSocket ss;
+    private DataOutputStream out;
+    private DataInputStream in;
 
 
-
-    public TMonitorHandler(Socket monitorSocket, ServerSocket ss, ObjectOutputStream outMonitor, ObjectInputStream inMonitor){
+    public TMonitorHandler(Socket monitorSocket, DataOutputStream outMonitor, DataInputStream inMonitor){
         this.socket = monitorSocket;
-        this.ss = ss;
         this.out = outMonitor;
         this.in = inMonitor;
     }
@@ -24,30 +19,31 @@ public class TMonitorHandler extends Thread{
     /**
      * Receives the answer from the server, via TCP/IP socket.
      */
-    private void startServer() throws ClassNotFoundException {
-
-        int port = 8080;
-        ServerSocket ss = null;
-        try {
-            ss = new ServerSocket(port);
-
-            socket = ss.accept();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        Object obj;
+    private void startClient() {
 
         while (true) {
             System.out.println("Server Connected");
+
             try {
-                System.out.println("here");
-                in = new ObjectInputStream(socket.getInputStream());
+                // read what received from Monitor
+//                String received = in.readUTF();
+//                System.out.println(received);
 
-                obj = in.readObject();
 
-                System.out.println("me");
-                System.out.println("Obj - " + obj);
+                String tosend = "coucou from client";
+                out.writeUTF(tosend);
+                System.out.println(tosend + " //has been sent");
+                out.writeUTF("Exit");
+
+                // Exiting from a while loo should be done when a client gives an exit message.
+                if(tosend.equals("Exit"))
+                {
+                    System.out.println("Connection closing... : " + socket);
+                    socket.close();
+                    System.out.println("Closed");
+                    break;
+                }
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -60,43 +56,24 @@ public class TMonitorHandler extends Thread{
     /**
      * Closes all communications.
      */
-    private void terminateServer(){
+    private void terminateClient(){
         try {
             in.close();
             out.close();
             socket.close();
-            ss.close();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-//    public void send(String message) {
-//        try {
-//            out.writeObject(message);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public String read() {
-//        String readMessage = null;
-//        try {
-//            readMessage = (String) in.readObject();
-//        } catch (IOException | ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        return readMessage;
-//    }
-
     @Override
     public void run() {
         try {
-            startServer();
-        } catch (ClassNotFoundException e) {
+            startClient();
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        terminateServer();
+        terminateClient();
     }
 }

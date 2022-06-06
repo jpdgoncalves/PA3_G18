@@ -6,8 +6,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Creates the answer to the requests made and sends said answer to the client that made the request
+ */
 public class TServer2Client extends Thread{
+
+    private final ReentrantLock lock = new ReentrantLock();
 
     private Request request;
     private int nr_iterations;
@@ -18,27 +24,8 @@ public class TServer2Client extends Thread{
 
     /**
      * Constructor
-     *
-     * @param request Request that will be processed
      */
-    public TServer2Client(Request request){
-        this.request = request;
-
-
-        this.nr_iterations = request.getNr_iterations();
-
-        //TODO get these params somehow
-        this.ip_client = "127.0.0.1";
-        this.port_client = 8080;
-
-        this.timePerIteration = request.getTimePerIteration();
-
-        //create socket
-        try {
-            s = new Socket(ip_client, port_client);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public TServer2Client(){
 
     }
 
@@ -74,7 +61,6 @@ public class TServer2Client extends Thread{
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
-
     }
 
     /**
@@ -88,6 +74,47 @@ public class TServer2Client extends Thread{
         }
     }
 
+    private void receiveRequest(){
+
+        //while server says nothing, wait
+
+        //server should unlock this
+        lock.lock();  // block until condition holds
+        try {
+            //TODO - receive request
+            //TODO - set params that should probs returned?
+
+
+        } finally {
+            lock.unlock();
+        }
+
+
+
+
+        //TODO - CODE DUMP
+
+        /* this.request = request;
+
+        this.nr_iterations = request.getNr_iterations();
+
+        //TODO get these params somehow, probs have a special request with that data
+        this.ip_client = "127.0.0.1";
+        this.port_client = 8080;
+
+        this.timePerIteration = request.getTimePerIteration();
+
+        //create socket
+        try {
+            s = new Socket(ip_client, port_client);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        */
+
+    }
+
     /**
      * The routine that will be done by each Server2Client thread
      */
@@ -95,22 +122,21 @@ public class TServer2Client extends Thread{
     public void run() {
         System.out.println("Server to client begins !");
 
-        //process requests
-        String answer = getPi(nr_iterations, timePerIteration);
+        while (true){
+            //TODO - wait to receive request
+            receiveRequest();
 
-        //sends info to client
-        sendInfo(answer);
+            //process requests
+            String answer = getPi(nr_iterations, timePerIteration);
 
-        System.out.println("Kill thread");
+            //sends info to client
+            sendInfo(answer);
+
+            //TODO - send indication to the server that I can receive and process another request
+        }
+        //System.out.println("Kill thread");
 
         //TODO - end connection, err killing client as well
         //terminateServer();
-
-
-
     }
-
-
-
-
 }

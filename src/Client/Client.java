@@ -1,5 +1,6 @@
 package Client;
 
+import Request.Request;
 import Server.TServer2Client;
 
 import java.io.DataInputStream;
@@ -10,6 +11,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.function.DoubleToIntFunction;
 
+/**
+ * Client class
+ */
 public class Client {
 
     private ServerSocket ss;
@@ -39,33 +43,24 @@ public class Client {
         //creates a client
         Client c = new Client();
 
-        //create a thread that deals with the future comunications with the server
-        THandleCommsServer hcs = new THandleCommsServer();
-        hcs.run();
-
-
-
-
-        //TODO - test value
+        //parse the arguments given via cmd
+        //nr_requests_to_send = args[0];
+        //TODO - test val
         c.nr_requests_to_do = 1;
 
-        //while there are requests to do
-        //while (c.nr_requests_to_do > c.nr_requests_sent){
-            // send a request
-            //TODO - define request and create comunication with load balancer
-            //String request = "2";
-            //c.sendrequest(request);
+        for (int req = 0; req < c.nr_requests_to_do; req ++){
 
-            //receive answer to the request, sent from the server
-            //c.receiveAnswer();
+            //create a new request
+            Request request = new Request(1,1,1,01,2,0,2,1000);
 
-        //}
+            //create a thread that send the request to the LB
+            TSend2LB stlb = new TSend2LB(request);
+            stlb.run();
 
-        //no more requests
-        //c.notKilled = false;
-
-        //terminate a server
-        //c.killServer();
+            //create a thread that deals with the future communications with the server
+            THandleCommsServer hcs = new THandleCommsServer();
+            hcs.run();
+        }
 
     }
 

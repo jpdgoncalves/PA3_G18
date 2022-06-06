@@ -2,34 +2,69 @@ package Server;
 
 import Request.Request;
 
+import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 /**
- * Server
+ * Server class
  */
 public class Server {
 
-    /**
-     * Blocking queue for the requests
-     */
-    static BlockingQueue<Request> request_list;
+    //Linked list for the requests
+    static LinkedList<Request> request_list;
 
+    //boolean that indicates if the server is still running
     static Boolean stillRunning = true;
 
-    public boolean addRequest (Request request){
+    /**
+     * Adds a request to the request list if the list is not full and returns an error if it is full.
+     *
+     * @param request request to add to the request_list
+     */
+    public void addRequest (Request request){
 
-        return request_list.add(request);
-    }
-
-    public static Request getRequest(){
-        try {
-            return request_list.take();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        if(request_list.size() < 2){
+            request_list.add(request);
+        } else {
+            //TODO - send err message
         }
     }
 
+    /**
+     * Gets the request with the lowest deadline.
+     *
+     * @return request with the lowest deadline
+     */
+    public static Request getRequest(){
+
+        int closestDeadline = Integer.MAX_VALUE;
+        int posWClosestDeadline = -1;
+
+        if (request_list.size() > 0) {
+
+            for (int i = 0; i < request_list.size(); i++) {
+
+                if (closestDeadline > request_list.get(i).getDeadline()) {
+                    //update
+                    closestDeadline = request_list.get(i).getDeadline();
+                    posWClosestDeadline = i;
+                }
+            }
+
+            Request returnVal = request_list.get(posWClosestDeadline);
+            request_list.remove(posWClosestDeadline);
+
+            return returnVal;
+        } else {
+            return new Request(-1, -1, -1, -1, -1, -1, -1, -1);
+        }
+    }
+
+    /**
+     * Sets the state of the simulation
+     * @param stillRunning new state of the simulation
+     */
     public void setStillRunning(Boolean stillRunning) {
         this.stillRunning = stillRunning;
     }
@@ -37,42 +72,26 @@ public class Server {
     public static void main(String[] args) { //chain of responsibility to not have like a 1000 diff types threads
 
         //create the request list
-        request_list = new LinkedBlockingDeque<>(2);
+        request_list = new LinkedList<Request>();
+
 
         //get the connections and the ports
-
         //1 server socket to receive requests from the load balancer
-
         //1 socket for the monitor (to receive the heartbeat and send info to the monitor)
 
-        //Create and run a String2Client thread
-        //String request = getRequest();
-        Request request = new Request(1,1,1,1,3,0,0, 1000);
-
-        TServer2Client stc = new TServer2Client(request);
-        stc.run();
-
-
-        while (stillRunning){
-            //attend the requests
-
-
-
-            //create 1 socket to send the response to the client
-            //send the answer
+        for (int i = 0; i < 3; i++){
+            //Create and run a String2Client thread which will take care of requests and send answers
+            TServer2Client stc = new TServer2Client();
+            stc.run();
         }
 
+        while (stillRunning){
+
+            //TODO - send requests to the stcs
 
 
-
-
-
-
-
-
-
-
-
+        }
+        //TODO - Kill comm channels
 
     }
 }

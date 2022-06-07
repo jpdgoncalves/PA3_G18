@@ -88,5 +88,10 @@ public class Request implements Serializable {
         this.timePerIteration = timePerIteration;
     }
 
-
+    @Override
+    public String toString() {
+        return "Client ID = " + getClientId() + ", requestId = " + getRequestId() + ", serverId = " + getServerId() +
+                ", code =" + getCode() + ", nr_iterations = " + getNr_iterations() + ", pi = "+ getPi() +
+                ", deadline = " + getDeadline() + ", timePerIteration = " + getTimePerIteration();
+    }
 }

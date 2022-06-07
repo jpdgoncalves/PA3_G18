@@ -1,15 +1,11 @@
 package Client;
 
-import Request.Request;
-import Server.TServer2Client;
+import Messages.Request;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.function.DoubleToIntFunction;
 
 /**
  * Client class
@@ -51,11 +47,11 @@ public class Client {
         for (int req = 0; req < c.nr_requests_to_do; req ++){
 
             //create a new request
-            Request request = new Request(1,1,1,01,2,0,2,1000);
+            Request request = new Request(1,1,1,01,2,0,2,"1000", 1);
 
             //create a thread that send the request to the LB
-            TSend2LB stlb = new TSend2LB(request);
-            stlb.run();
+            /*TSend2LB stlb = new TSend2LB(request);
+            stlb.run();*/
 
             //create a thread that deals with the future communications with the server
             THandleCommsServer hcs = new THandleCommsServer();

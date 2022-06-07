@@ -1,4 +1,4 @@
-package Request;
+package Messages;
 
 import java.io.Serializable;
 
@@ -11,9 +11,10 @@ public class Request implements Serializable {
     private int nr_iterations;
     private int pi;
     private int deadline;
-    private int timePerIteration;
+    private String target_IP;
+    private int targetPort;
 
-    public Request(int clientId, int requestId, int serverId, int code, int nr_iterations, int pi, int deadline, int timePerIteration) {
+    public Request(int clientId, int requestId, int serverId, int code, int nr_iterations, int pi, int deadline, String target_IP, int targetPort) {
         this.clientId = clientId;
         this.requestId = requestId;
         this.serverId = serverId;
@@ -21,7 +22,8 @@ public class Request implements Serializable {
         this.nr_iterations = nr_iterations;
         this.pi = pi;
         this.deadline = deadline;
-        this.timePerIteration = timePerIteration;
+        this.target_IP = target_IP;
+        this.targetPort = targetPort;
     }
 
     public int getClientId() {
@@ -80,18 +82,24 @@ public class Request implements Serializable {
         this.deadline = deadline;
     }
 
-    public int getTimePerIteration() {
-        return timePerIteration;
+    public String getTarget_IP() {
+        return target_IP;
     }
 
-    public void setTimePerIteration(int timePerIteration) {
-        this.timePerIteration = timePerIteration;
+    public void setTarget_IP(String target_ip) { this.target_IP = target_ip; }
+
+    public int getTargetPort() {
+        return targetPort;
+    }
+
+    public void setTargetPort(int targetPort) {
+        this.targetPort = targetPort;
     }
 
     @Override
     public String toString() {
         return "Client ID = " + getClientId() + ", requestId = " + getRequestId() + ", serverId = " + getServerId() +
                 ", code =" + getCode() + ", nr_iterations = " + getNr_iterations() + ", pi = "+ getPi() +
-                ", deadline = " + getDeadline() + ", timePerIteration = " + getTimePerIteration();
+                ", deadline = " + getDeadline() + ", targetIP = " + getTarget_IP() + ", target port = " + getTargetPort();
     }
 }

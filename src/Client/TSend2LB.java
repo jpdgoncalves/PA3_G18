@@ -1,6 +1,6 @@
 package Client;
 
-import Request.Request;
+import Messages.Request;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -31,7 +31,7 @@ public class TSend2LB extends Thread{
         this.ip_LB = "127.0.0.1";
         this.port_LB = 9090;
 
-        this.timePerIteration = request.getTimePerIteration();
+        this.timePerIteration = 1000;
 
         //create socket
         try {

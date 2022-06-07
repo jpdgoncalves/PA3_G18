@@ -8,32 +8,58 @@ public class Monitor {
 
     public static void main(String[] args) throws IOException
     {
-        ServerSocket myserverSocket = new ServerSocket(5056);
+        ServerSocket lbSocketServer = new ServerSocket(5056);
+        ServerSocket serverSocketServer = new ServerSocket(5057);
         // getting client request
         while (true)
         // running infinite loop
         {
-            Socket socket = null;
+            Socket lbSocketClient = null;
+            Socket serverSocketClient = null;
 
             try
             {
-                // socket object to receive incoming client requests
-                socket = myserverSocket.accept();
+                // socket object to receive incoming client requests from load balancer
+                lbSocketClient = lbSocketServer.accept();
 
-                System.out.println("A new connection identified : " + socket);
+                // socket object to receive incoming client requests from server
+                serverSocketClient = serverSocketServer.accept();
+
+                /* DIS and DOS for LB ! */
+
+                System.out.println("A new connection identified : " + lbSocketClient);
                 // obtaining input and out streams
-                DataInputStream ournewDataInputstream = new DataInputStream(socket.getInputStream());
-                DataOutputStream ournewDataOutputstream = new DataOutputStream(socket.getOutputStream());
+                DataInputStream ournewDataInputstream = new DataInputStream(lbSocketClient.getInputStream());
+                DataOutputStream ournewDataOutputstream = new DataOutputStream(lbSocketClient.getOutputStream());
 
-                System.out.println("Thread assigned");
 
-                Thread myThread = new TLoadBalancerHandler(socket, ournewDataInputstream, ournewDataOutputstream);
+
+                /* DIS and DOS for server ! */
+
+                System.out.println("A new connection identified : " + serverSocketClient);
+                // obtaining input and out streams
+                DataInputStream disServer = new DataInputStream(serverSocketClient.getInputStream());
+                DataOutputStream dosServer = new DataOutputStream(serverSocketClient.getOutputStream());
+
+
+
+                /* Instantiation thread for LB */
+                System.out.println("Connection with LB ! ");
+                Thread lbThread = new TLoadBalancerHandler(lbSocketClient, ournewDataInputstream, ournewDataOutputstream);
                 // starting
-                myThread.start();
+                lbThread.start();
+
+
+                /* Instantiation thread for Server */
+                System.out.println("Connection with Server !");
+                Thread serverThread = new TServerHandler(serverSocketClient, disServer, dosServer);
+                // starting
+                serverThread.start();
 
             }
             catch (Exception e){
-                socket.close();
+                lbSocketClient.close();
+                serverSocketServer.close();
                 e.printStackTrace();
             }
         }

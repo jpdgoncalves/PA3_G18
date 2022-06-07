@@ -2,6 +2,10 @@ package Server;
 
 import Request.Request;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -69,7 +73,7 @@ public class Server {
         this.stillRunning = stillRunning;
     }
 
-    public static void main(String[] args) { //chain of responsibility to not have like a 1000 diff types threads
+    public static void main(String[] args) throws IOException { //chain of responsibility to not have like a 1000 diff types threads
 
         //create the request list
         request_list = new LinkedList<Request>();
@@ -79,11 +83,17 @@ public class Server {
         //1 server socket to receive requests from the load balancer
         //1 socket for the monitor (to receive the heartbeat and send info to the monitor)
 
-        for (int i = 0; i < 3; i++){
-            //Create and run a String2Client thread which will take care of requests and send answers
-            TServer2Client stc = new TServer2Client();
-            stc.run();
-        }
+//        for (int i = 0; i < 3; i++){
+//            //Create and run a String2Client thread which will take care of requests and send answers
+//            TServer2Client stc = new TServer2Client();
+//            stc.run();
+//        }
+
+        Socket serverSocket = new Socket("localhost", 5057);
+        DataInputStream disServer = new DataInputStream(serverSocket.getInputStream());
+        DataOutputStream dosServer = new DataOutputStream(serverSocket.getOutputStream());
+        TMonitorHandlerFromServer tserver = new TMonitorHandlerFromServer(serverSocket, dosServer, disServer);
+        tserver.start();
 
         while (stillRunning){
 

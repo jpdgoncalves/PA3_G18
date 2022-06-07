@@ -23,30 +23,32 @@ public class TLoadBalancerHandler extends Thread{
     {
         String receivedString;
         String stringToReturn;
-        while (true)
-        {
+//        while (true)
+//        {
             try {
                 receivedString = ournewDataInputstream.readUTF();
                 System.out.println("received :: "+ receivedString);
                 ournewDataOutputstream.writeUTF("Received from LB : " + receivedString);
+//                stringToReturn = "coucou from monitor";
+//                ournewDataOutputstream.writeUTF(stringToReturn);
 
                 if(receivedString.equals("Exit"))
                 {
                     System.out.println("Client " + this.mynewSocket + " sends exit...");
                     System.out.println("Connection closing...");
                     this.mynewSocket.close();
+                    this.ournewDataOutputstream.close();
+                    this.ournewDataInputstream.close();
                     System.out.println("Closed");
-                    break;
+                    return;
                 }
 
-                stringToReturn = "coucou from monitor";
-                ournewDataOutputstream.writeUTF(stringToReturn);
 
             } catch (IOException e) {
                 System.out.println("Problem inside handler LB !!");
                 e.printStackTrace();
             }
-        }
+//        }
 
         try
         {

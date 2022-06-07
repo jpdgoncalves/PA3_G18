@@ -56,6 +56,9 @@ public class Monitor {
                 // starting
                 serverThread.start();
 
+                lbThread.join();
+                serverThread.join();
+
             }
             catch (Exception e){
                 lbSocketClient.close();

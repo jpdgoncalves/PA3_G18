@@ -90,18 +90,23 @@ public class Server {
 //        }
 
         Socket serverSocket = new Socket("localhost", 5057);
-        DataInputStream disServer = new DataInputStream(serverSocket.getInputStream());
-        DataOutputStream dosServer = new DataOutputStream(serverSocket.getOutputStream());
-        TMonitorHandlerFromServer tserver = new TMonitorHandlerFromServer(serverSocket, dosServer, disServer);
-        tserver.start();
+        try {
+            DataInputStream disServer = new DataInputStream(serverSocket.getInputStream());
+            DataOutputStream dosServer = new DataOutputStream(serverSocket.getOutputStream());
+            TMonitorHandlerFromServer tserver = new TMonitorHandlerFromServer(serverSocket, dosServer, disServer);
+            tserver.start();
+            tserver.join();
 
-        while (stillRunning){
-
-            //TODO - send requests to the stcs
-
+//            while (stillRunning){
+//
+//                //TODO - send requests to the stcs
+//
+//
+//            }
+//            //TODO - Kill comm channels
+        }catch (Exception e){
 
         }
-        //TODO - Kill comm channels
 
     }
 }

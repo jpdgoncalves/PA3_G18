@@ -23,7 +23,7 @@ public class Monitor {
                 lbSocketClient = lbSocketServer.accept();
 
                 // socket object to receive incoming client requests from server
-                serverSocketClient = serverSocketServer.accept();
+//                serverSocketClient = serverSocketServer.accept();
 
                 /* DIS and DOS for LB ! */
 
@@ -36,10 +36,10 @@ public class Monitor {
 
                 /* DIS and DOS for server ! */
 
-                System.out.println("A new connection identified : " + serverSocketClient);
-                // obtaining input and out streams
-                ObjectInputStream disServer = new ObjectInputStream(serverSocketClient.getInputStream());
-                ObjectOutputStream dosServer = new ObjectOutputStream(serverSocketClient.getOutputStream());
+//                System.out.println("A new connection identified : " + serverSocketClient);
+//                // obtaining input and out streams
+//                ObjectInputStream disServer = new ObjectInputStream(serverSocketClient.getInputStream());
+//                ObjectOutputStream dosServer = new ObjectOutputStream(serverSocketClient.getOutputStream());
 
 
 
@@ -51,13 +51,13 @@ public class Monitor {
 
 
                 /* Instantiation thread for Server */
-                System.out.println("Connection with Server !");
-                Thread serverThread = new TServerHandler(serverSocketClient, disServer, dosServer);
-                // starting
-                serverThread.start();
+//                System.out.println("Connection with Server !");
+//                Thread serverThread = new TServerHandler(serverSocketClient, disServer, dosServer);
+//                // starting
+//                serverThread.start();
 
                 lbThread.join();
-                serverThread.join();
+//                serverThread.join();
 
             }
             catch (Exception e){
@@ -67,4 +67,28 @@ public class Monitor {
             }
         }
     }
+
+//    private void createThread(Socket clientSocket) throws IOException, InterruptedException {
+//        System.out.println("A new connection identified : " + clientSocket);
+//        // obtaining input and out streams
+//        ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
+//        ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
+//
+//        if(clientSocket.getPort() == 5056){
+//            /* Instantiation thread for LB */
+//            System.out.println("Connection with LB ! ");
+//            Thread lbThread = new TLoadBalancerHandler(clientSocket, ois, oos);
+//            // starting
+//            lbThread.start();
+//            lbThread.join();
+//        } else if (clientSocket.getPort() == 5057) {
+//            /* Instantiation thread for Server */
+//            System.out.println("Connection with Server !");
+//            Thread serverThread = new TServerHandler(clientSocket, ois, oos);
+//            // starting
+//            serverThread.start();
+//            serverThread.join();
+//        }
+//    }
+
 }

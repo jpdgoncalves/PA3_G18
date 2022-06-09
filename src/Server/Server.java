@@ -2,9 +2,7 @@ package Server;
 
 import Messages.Request;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -109,27 +107,30 @@ public class Server {
 
 
         //start the execution of the TServer2Client
-        for (int i = 0; i < 3; i++) {
-
-            //Create and run a String2Client thread which will take care of requests and send answers
-            TServer2Client stc = new TServer2Client();
-            stc.run();
-
-            //add to list of available threads
-            addServer2Client(stc);
-        }
+//        for (int i = 0; i < 3; i++) {
+//
+//            //Create and run a String2Client thread which will take care of requests and send answers
+//            TServer2Client stc = new TServer2Client();
+//            stc.run();
+//
+//            //add to list of available threads
+//            addServer2Client(stc);
+//        }
 
         //TMonitorHandlerFromServer block of code
-        /*Socket serverSocket = new Socket("localhost", 5057);
+        System.out.println("Connection with monitor");
+        Socket serverSocket = new Socket("localhost", 5057);
         try {
-            DataInputStream disServer = new DataInputStream(serverSocket.getInputStream());
-            DataOutputStream dosServer = new DataOutputStream(serverSocket.getOutputStream());
+            ObjectOutputStream dosServer = new ObjectOutputStream(serverSocket.getOutputStream());
+            ObjectInputStream disServer = new ObjectInputStream(serverSocket.getInputStream());
+            System.out.println("Starting thread !");
             TMonitorHandlerFromServer tserver = new TMonitorHandlerFromServer(serverSocket, dosServer, disServer);
+            System.out.println("Thread linked to Monitor");
             tserver.start();
             tserver.join();
         }catch (Exception e){
 
-        }*/
+        }
 
         /*while (stillRunning){
             //warn them to come get a request

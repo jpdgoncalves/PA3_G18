@@ -1,19 +1,17 @@
 package Monitor;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 public class TServerHandler extends Thread{
 
-    final DataInputStream ournewDataInputstream;
-    final DataOutputStream ournewDataOutputstream;
+    final ObjectInputStream ournewDataInputstream;
+    final ObjectOutputStream ournewDataOutputstream;
     final Socket mynewSocket;
 
 
     // Constructor
-    public TServerHandler(Socket mynewSocket, DataInputStream ournewDataInputstream, DataOutputStream ournewDataOutputstream)
+    public TServerHandler(Socket mynewSocket, ObjectInputStream ournewDataInputstream, ObjectOutputStream ournewDataOutputstream)
     {
         this.mynewSocket = mynewSocket;
         this.ournewDataInputstream = ournewDataInputstream;
@@ -24,12 +22,13 @@ public class TServerHandler extends Thread{
     public void run()
     {
         String receivedString;
-        while (true)
-        {
+//        while (true)
+//        {
             try {
                 System.out.println("Connection with server done !");
                 receivedString = ournewDataInputstream.readUTF();
                 System.out.println("Server sent :: "+ receivedString);
+                ournewDataOutputstream.flush();
 
                 if(receivedString.equals("Exit"))
                 {
@@ -37,7 +36,7 @@ public class TServerHandler extends Thread{
                     System.out.println("Connection closing...");
                     this.mynewSocket.close();
                     System.out.println("Closed");
-                    break;
+                    return;
                 }
 
 //                stringToReturn = "coucou from monitor";
@@ -47,7 +46,7 @@ public class TServerHandler extends Thread{
                 System.out.println("Problem inside handler LB !!");
                 e.printStackTrace();
             }
-        }
+//        }
 
         try
         {

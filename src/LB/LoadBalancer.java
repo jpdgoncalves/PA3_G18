@@ -13,8 +13,8 @@ public class LoadBalancer {
             // establishing the connection
             socket = new Socket("localhost",5056);
             System.out.println("connection established");
-            DataInputStream dis = new DataInputStream(socket.getInputStream());
-            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+            ObjectInputStream dis = new ObjectInputStream(socket.getInputStream());
+            ObjectOutputStream dos = new ObjectOutputStream(socket.getOutputStream());
 
             Thread monitor = new TMonitorHandler(socket, dos, dis);
             monitor.start();

@@ -5,13 +5,13 @@ import java.net.Socket;
 
 public class TLoadBalancerHandler extends Thread{
 
-    final DataInputStream ournewDataInputstream;
-    final DataOutputStream ournewDataOutputstream;
+    final ObjectInputStream ournewDataInputstream;
+    final ObjectOutputStream ournewDataOutputstream;
     final Socket mynewSocket;
 
 
     // Constructor
-    public TLoadBalancerHandler(Socket mynewSocket, DataInputStream ournewDataInputstream, DataOutputStream ournewDataOutputstream)
+    public TLoadBalancerHandler(Socket mynewSocket, ObjectInputStream ournewDataInputstream, ObjectOutputStream ournewDataOutputstream)
     {
         this.mynewSocket = mynewSocket;
         this.ournewDataInputstream = ournewDataInputstream;
@@ -31,6 +31,8 @@ public class TLoadBalancerHandler extends Thread{
                 ournewDataOutputstream.writeUTF("Received from LB : " + receivedString);
 //                stringToReturn = "coucou from monitor";
 //                ournewDataOutputstream.writeUTF(stringToReturn);
+
+                ournewDataOutputstream.flush();
 
                 if(receivedString.equals("Exit"))
                 {

@@ -29,8 +29,8 @@ public class Monitor {
 
                 System.out.println("A new connection identified : " + lbSocketClient);
                 // obtaining input and out streams
-                DataInputStream ournewDataInputstream = new DataInputStream(lbSocketClient.getInputStream());
-                DataOutputStream ournewDataOutputstream = new DataOutputStream(lbSocketClient.getOutputStream());
+                ObjectInputStream ournewDataInputstream = new ObjectInputStream(lbSocketClient.getInputStream());
+                ObjectOutputStream ournewDataOutputstream = new ObjectOutputStream(lbSocketClient.getOutputStream());
 
 
 
@@ -38,8 +38,8 @@ public class Monitor {
 
                 System.out.println("A new connection identified : " + serverSocketClient);
                 // obtaining input and out streams
-                DataInputStream disServer = new DataInputStream(serverSocketClient.getInputStream());
-                DataOutputStream dosServer = new DataOutputStream(serverSocketClient.getOutputStream());
+                ObjectInputStream disServer = new ObjectInputStream(serverSocketClient.getInputStream());
+                ObjectOutputStream dosServer = new ObjectOutputStream(serverSocketClient.getOutputStream());
 
 
 
@@ -62,7 +62,7 @@ public class Monitor {
             }
             catch (Exception e){
                 lbSocketClient.close();
-                serverSocketServer.close();
+                serverSocketClient.close();
                 e.printStackTrace();
             }
         }

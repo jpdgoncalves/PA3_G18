@@ -1,17 +1,15 @@
 package Server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 public class TMonitorHandlerFromServer extends Thread{
     private Socket socket;
-    private DataOutputStream out;
-    private DataInputStream in;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
 
 
-    public TMonitorHandlerFromServer(Socket monitorSocket, DataOutputStream outMonitor, DataInputStream inMonitor){
+    public TMonitorHandlerFromServer(Socket monitorSocket, ObjectOutputStream outMonitor, ObjectInputStream inMonitor){
         this.socket = monitorSocket;
         this.out = outMonitor;
         this.in = inMonitor;
@@ -28,6 +26,7 @@ public class TMonitorHandlerFromServer extends Thread{
                 out.writeUTF(tosend);
                 tosend = "Exit";
                 out.writeUTF(tosend);
+                out.flush();
 
                 // Exiting from a while loo should be done when a client gives an exit message.
                 if(tosend.equals("Exit"))

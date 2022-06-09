@@ -5,11 +5,11 @@ import java.net.Socket;
 
 public class TMonitorHandler extends Thread{
     private Socket socket;
-    private DataOutputStream out;
-    private DataInputStream in;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
 
 
-    public TMonitorHandler(Socket monitorSocket, DataOutputStream outMonitor, DataInputStream inMonitor){
+    public TMonitorHandler(Socket monitorSocket, ObjectOutputStream outMonitor, ObjectInputStream inMonitor){
         this.socket = monitorSocket;
         this.out = outMonitor;
         this.in = inMonitor;
@@ -19,13 +19,14 @@ public class TMonitorHandler extends Thread{
      * Receives the answer from the server, via TCP/IP socket.
      */
     private void startClient() {
-            System.out.println("Server Connected");
+            System.out.println("Monitor Connected");
 
             try {
                 String tosend = "coucou from client";
                 out.writeUTF(tosend);
                 tosend = "Exit";
                 out.writeUTF(tosend);
+                out.flush();
 
                 // Exiting from a while loo should be done when a client gives an exit message.
                 if(tosend.equals("Exit"))

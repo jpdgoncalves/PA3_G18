@@ -23,39 +23,35 @@ public class TLoadBalancerHandler extends Thread{
     @Override
     public void run()
     {
-//        String receivedString;
         Request receivedRequest = null;
-//        while (true)
-//        {
+        int i=0;
+        while (true)
+        {
+            System.out.println("loop number : " + i);
             try {
                 receivedRequest = (Request) ournewDataInputstream.readObject();
                 System.out.println("received :: request.deadline = "+ receivedRequest.getDeadline());
-//                ournewDataOutputstream.writeUTF("Received from LB : " + receivedString);
-//                stringToReturn = "coucou from monitor";
-//                ournewDataOutputstream.writeUTF(stringToReturn);
 
                 ournewDataOutputstream.flush();
 
-//                if(receivedString.equals("Exit"))
-//                {
-//                    System.out.println("Client " + this.mynewSocket + " sends exit...");
-//                    System.out.println("Connection closing...");
-//                    this.mynewSocket.close();
-//                    this.ournewDataOutputstream.close();
-//                    this.ournewDataInputstream.close();
-//                    System.out.println("Closed");
-//                    break;
-//                }
-                return;
+                if(receivedRequest.getDeadline() == -1)
+                {
+                    System.out.println("Client " + this.mynewSocket + " sends exit...");
+                    System.out.println("Connection closing...");
+                    this.mynewSocket.close();
+                    this.ournewDataOutputstream.close();
+                    this.ournewDataInputstream.close();
+                    System.out.println("Closed");
+                    break;
+                }
 
             } catch (IOException | ClassNotFoundException e) {
                 System.out.println("Error");
             }
-//        }
+        }
 
         try
         {
-
             // closing resources
             this.ournewDataInputstream.close();
             this.ournewDataOutputstream.close();

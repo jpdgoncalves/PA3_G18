@@ -1,5 +1,7 @@
 package Monitor;
 
+import Messages.Request;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -21,34 +23,33 @@ public class TLoadBalancerHandler extends Thread{
     @Override
     public void run()
     {
-        String receivedString;
-        String stringToReturn;
+//        String receivedString;
+        Request receivedRequest = null;
 //        while (true)
 //        {
             try {
-                receivedString = ournewDataInputstream.readUTF();
-                System.out.println("received :: "+ receivedString);
-                ournewDataOutputstream.writeUTF("Received from LB : " + receivedString);
+                receivedRequest = (Request) ournewDataInputstream.readObject();
+                System.out.println("received :: request.deadline = "+ receivedRequest.getDeadline());
+//                ournewDataOutputstream.writeUTF("Received from LB : " + receivedString);
 //                stringToReturn = "coucou from monitor";
 //                ournewDataOutputstream.writeUTF(stringToReturn);
 
                 ournewDataOutputstream.flush();
 
-                if(receivedString.equals("Exit"))
-                {
-                    System.out.println("Client " + this.mynewSocket + " sends exit...");
-                    System.out.println("Connection closing...");
-                    this.mynewSocket.close();
-                    this.ournewDataOutputstream.close();
-                    this.ournewDataInputstream.close();
-                    System.out.println("Closed");
-                    return;
-                }
+//                if(receivedString.equals("Exit"))
+//                {
+//                    System.out.println("Client " + this.mynewSocket + " sends exit...");
+//                    System.out.println("Connection closing...");
+//                    this.mynewSocket.close();
+//                    this.ournewDataOutputstream.close();
+//                    this.ournewDataInputstream.close();
+//                    System.out.println("Closed");
+//                    break;
+//                }
+                return;
 
-
-            } catch (IOException e) {
-                System.out.println("Problem inside handler LB !!");
-                e.printStackTrace();
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("Error");
             }
 //        }
 

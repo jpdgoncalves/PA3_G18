@@ -1,5 +1,7 @@
 package Server;
 
+import Messages.Request;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -19,29 +21,31 @@ public class TMonitorHandlerFromServer extends Thread{
      * Receives the answer from the server, via TCP/IP socket.
      */
     private void startClient() {
-            System.out.println("Server Connected");
+        System.out.println("Monitor Connected");
 
-            try {
-                String tosend = "coucou from client";
-                out.writeUTF(tosend);
-                tosend = "Exit";
-                out.writeUTF(tosend);
-                out.flush();
+        try {
 
-                // Exiting from a while loo should be done when a client gives an exit message.
-                if(tosend.equals("Exit"))
-                {
-                    System.out.println("Connection closing... : " + socket);
-                    socket.close();
-                    System.out.println("Closed");
-                }
+            Request request = new Request(1, 2, 3, 4, 5, 6, 7, "127.0.0.1", 8080);
 
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            out.writeObject(request);
+
+            request = new Request(1, 2, 3, 4, 5, 6, -1, "127.0.0.1", 8080);
+            out.writeObject(request);
+            System.out.println("sent end deadline ");
+
+            out.flush();
+
+            // Exiting from a while loo should be done when a client gives a deadline of -1.
+            if(request.getDeadline() == -1)
+            {
+                System.out.println("Connection closing... : " + socket);
+                socket.close();
+                System.out.println("Closed");
             }
 
-
-
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

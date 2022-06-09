@@ -1,5 +1,7 @@
 package Monitor;
 
+import Messages.Request;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -21,36 +23,35 @@ public class TServerHandler extends Thread{
     @Override
     public void run()
     {
-        String receivedString;
-//        while (true)
-//        {
+        Request receivedRequest = null;
+        int i=0;
+        while (true)
+        {
+            System.out.println("loop number : " + i);
             try {
-                System.out.println("Connection with server done !");
-                receivedString = ournewDataInputstream.readUTF();
-                System.out.println("Server sent :: "+ receivedString);
+                receivedRequest = (Request) ournewDataInputstream.readObject();
+                System.out.println("received :: request.deadline = "+ receivedRequest.getDeadline());
+
                 ournewDataOutputstream.flush();
 
-                if(receivedString.equals("Exit"))
+                if(receivedRequest.getDeadline() == -1)
                 {
-                    System.out.println("Server " + this.mynewSocket + " sends exit...");
+                    System.out.println("Client " + this.mynewSocket + " sends exit...");
                     System.out.println("Connection closing...");
                     this.mynewSocket.close();
+                    this.ournewDataOutputstream.close();
+                    this.ournewDataInputstream.close();
                     System.out.println("Closed");
-                    return;
+                    break;
                 }
 
-//                stringToReturn = "coucou from monitor";
-//                ournewDataOutputstream.writeUTF(stringToReturn);
-
-            } catch (IOException e) {
-                System.out.println("Problem inside handler LB !!");
-                e.printStackTrace();
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("Error");
             }
-//        }
+        }
 
         try
         {
-
             // closing resources
             this.ournewDataInputstream.close();
             this.ournewDataOutputstream.close();

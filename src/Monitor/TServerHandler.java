@@ -11,7 +11,6 @@ public class TServerHandler extends Thread{
     final ObjectOutputStream oos;
     final Socket serverSocket;
 
-
     // Constructor
     public TServerHandler(Socket mynewSocket, ObjectInputStream ournewDataInputstream, ObjectOutputStream ournewDataOutputstream)
     {

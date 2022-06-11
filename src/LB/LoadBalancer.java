@@ -1,13 +1,26 @@
 package LB;
 
+import Messages.Request;
+import Monitor.TServerHandler;
+
 import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.LinkedList;
 
 public class LoadBalancer {
 
-    public static void main(String[] args) throws IOException
-    {
-        Socket socket = null;
+    private static LinkedList <Request> listRequests = new LinkedList<>();
+
+
+
+    public static void addRequest(Request request) {
+        listRequests.add(request);
+    }
+
+    public static void main(String[] args) throws IOException {
+
+        /*Socket socket = null;
         try
         {
             // establishing the connection
@@ -24,5 +37,39 @@ public class LoadBalancer {
             socket.close();
             e.printStackTrace();
         }
+    }*/
+
+
+        ServerSocket serverSocketServer = new ServerSocket(9090);
+        // getting client request
+        while (true)
+        // running infinite loop
+        {
+            Socket serverSocketClient = null;
+
+            try {
+                serverSocketClient = serverSocketServer.accept();
+
+                /* DIS and DOS for server ! */
+
+                System.out.println("A new connection identified : " + serverSocketClient);
+                // obtaining input and out streams
+                ObjectInputStream disServer = new ObjectInputStream(serverSocketClient.getInputStream());
+                ObjectOutputStream dosServer = new ObjectOutputStream(serverSocketClient.getOutputStream());
+
+                /* Instantiation thread for Server */
+                System.out.println("Connection with Server !");
+                THandleCommClients thcwc = new THandleCommClients(serverSocketClient, disServer, dosServer);
+                // starting
+                thcwc.start();
+                thcwc.join();
+
+            } catch (Exception e) {
+                serverSocketClient.close();
+                e.printStackTrace();
+            }
+        }
     }
+
 }
+

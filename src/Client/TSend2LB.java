@@ -2,88 +2,84 @@ package Client;
 
 import Messages.Request;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.util.LinkedList;
 
 /**
  * Sends a request from the client to the load balancer
  */
 public class TSend2LB extends Thread{
+    private Socket socket;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
 
-    private Request request;
-    private int nr_iterations;
-    private String ip_LB;
-    private int port_LB;
-    private int timePerIteration;
-    private Socket s;
+    private LinkedList<Request> listRequest;
 
-    /**
-     * Constructor
-     *
-     * @param request Request that will be processed
-     */
-    public TSend2LB(Request request){
-        this.request = request;
-        this.nr_iterations = request.getNr_iterations();
 
-        //TODO get these params somehow
-        this.ip_LB = "127.0.0.1";
-        this.port_LB = 9090;
-
-        this.timePerIteration = 1000;
-
-        //create socket
-        try {
-            s = new Socket(ip_LB, port_LB);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    public TSend2LB(Socket monitorSocket, ObjectOutputStream outMonitor, ObjectInputStream inMonitor, LinkedList<Request> listRequest){
+        this.socket = monitorSocket;
+        this.out = outMonitor;
+        this.in = inMonitor;
+        this.listRequest = listRequest;
     }
 
     /**
-     * Sends the request to the load balancer, via TCP/IP socket
+     * Receives the answer from the server, via TCP/IP socket.
      */
-    private void sendInfo(Request request) {
+    private void startClient() {
+        System.out.println("Monitor Connected");
 
         try {
-            ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+
+            //sends all requests received from the client
+            for (int i = 0; i < listRequest.size(); i++) {
+
+                out.writeObject(listRequest.get(i));
+            }
+
+            //sends the death signal
+            Request request = new Request(1, 2, 3, 4, 5, 6, -1, "127.0.0.1", 8080);
             out.writeObject(request);
 
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
+            System.out.println("sent end deadline ");
 
-    }
+            out.flush();
 
-    /**
-     * TODO - not working, killing LB(?) as well (idk not tested here but I suppose it is still true)
-     */
-    private void terminateServer() {
-        try {
-            s.close();
+            // Exiting from a while loo should be done when a client gives a deadline of -1.
+            if(request.getDeadline() == -1)
+            {
+                System.out.println("Connection closing... : " + socket);
+                socket.close();
+                System.out.println("Closed");
+            }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * The routine that will be done by each Server2Client thread
+     * Closes all communications.
      */
-    @Override
-    public void run() {
-        System.out.println("Server to client begins !");
+    private void terminateClient(){
+        try {
+            in.close();
+            out.close();
+            socket.close();
 
-        //sends info to client
-        sendInfo(request);
-
-        //System.out.println("Kill thread");
-
-        //TODO - end connection, err killing client as well(I suppose it is still true)
-        //terminateServer();
-
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
+    @Override
+    public void run() {
+        try {
+            startClient();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        terminateClient();
+    }
 }
-

@@ -5,13 +5,13 @@ import Messages.Request;
 import java.io.*;
 import java.net.Socket;
 
-public class TMonitorHandlerFromServer extends Thread{
+public class TMonitorHandler extends Thread{
     private Socket monitorSocket;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
 
 
-    public TMonitorHandlerFromServer(Socket monitorSocket, ObjectOutputStream outMonitor, ObjectInputStream inMonitor){
+    public TMonitorHandler(Socket monitorSocket, ObjectOutputStream outMonitor, ObjectInputStream inMonitor){
         this.monitorSocket = monitorSocket;
         this.oos = outMonitor;
         this.ois = inMonitor;

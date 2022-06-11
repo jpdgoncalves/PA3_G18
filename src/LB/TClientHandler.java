@@ -4,7 +4,7 @@ import Messages.Request;
 import java.net.*;
 import java.io.*;
 
-public class THandleCommClients extends Thread
+public class TClientHandler extends Thread
 {
     final ObjectInputStream in;
     final ObjectOutputStream out;
@@ -12,7 +12,7 @@ public class THandleCommClients extends Thread
 
 
     // Constructor
-    public THandleCommClients(Socket socket, ObjectInputStream in, ObjectOutputStream out)
+    public TClientHandler(Socket socket, ObjectInputStream in, ObjectOutputStream out)
     {
         this.socket = socket;
         this.in = in;

@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class THandleCommsServer extends Thread {
+public class TServerHandler extends Thread {
 
     private ServerSocket ss;
     private Socket socket;

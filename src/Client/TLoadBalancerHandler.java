@@ -9,7 +9,7 @@ import java.util.LinkedList;
 /**
  * Sends a request from the client to the load balancer
  */
-public class TSend2LB extends Thread{
+public class TLoadBalancerHandler extends Thread{
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
@@ -17,7 +17,7 @@ public class TSend2LB extends Thread{
     private LinkedList<Request> listRequest;
 
 
-    public TSend2LB(Socket monitorSocket, ObjectOutputStream outMonitor, ObjectInputStream inMonitor, LinkedList<Request> listRequest){
+    public TLoadBalancerHandler(Socket monitorSocket, ObjectOutputStream outMonitor, ObjectInputStream inMonitor, LinkedList<Request> listRequest){
         this.socket = monitorSocket;
         this.out = outMonitor;
         this.in = inMonitor;

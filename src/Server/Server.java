@@ -6,7 +6,6 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Comparator;
 import java.util.LinkedList;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 /**
@@ -20,7 +19,7 @@ public class Server {
     private static int empty_postions = 2;
 
     //Linked list of servers available
-    private static LinkedList<TServer2Client> llts2c = new LinkedList<TServer2Client>();
+    private static LinkedList<TClientHandler> llts2c = new LinkedList<TClientHandler>();
 
     //boolean that indicates if the server is still running
     private static Boolean stillRunning = true;
@@ -70,11 +69,11 @@ public class Server {
         }
     }*/
 
-    public static void addServer2Client(TServer2Client s2c){
+    public static void addServer2Client(TClientHandler s2c){
         llts2c.add(s2c);
     }
 
-    private static TServer2Client getAServer2Client(){
+    private static TClientHandler getAServer2Client(){
         return llts2c.pop();
     }
 
@@ -124,7 +123,7 @@ public class Server {
             ObjectOutputStream dosServer = new ObjectOutputStream(serverSocket.getOutputStream());
             ObjectInputStream disServer = new ObjectInputStream(serverSocket.getInputStream());
             System.out.println("Starting thread !");
-            TMonitorHandlerFromServer tserver = new TMonitorHandlerFromServer(serverSocket, dosServer, disServer);
+            TMonitorHandler tserver = new TMonitorHandler(serverSocket, dosServer, disServer);
             System.out.println("Thread linked to Monitor");
             tserver.start();
             tserver.join();

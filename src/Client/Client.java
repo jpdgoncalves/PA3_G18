@@ -2,11 +2,9 @@ package Client;
 
 import Messages.Request;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
 
@@ -42,7 +40,7 @@ public class Client {
             System.out.println("Starting thread !");
 
             //starts the threads
-            TSend2LB tserver = new TSend2LB(serverSocket, dosServer, disServer, listRequest);
+            TLoadBalancerHandler tserver = new TLoadBalancerHandler(serverSocket, dosServer, disServer, listRequest);
             System.out.println("Thread linked to Monitor");
             tserver.start();
             tserver.join();

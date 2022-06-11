@@ -1,7 +1,6 @@
 package LB;
 
 import Messages.Request;
-import Monitor.TServerHandler;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -59,7 +58,7 @@ public class LoadBalancer {
 
                 /* Instantiation thread for Server */
                 System.out.println("Connection with Server !");
-                THandleCommClients thcwc = new THandleCommClients(serverSocketClient, disServer, dosServer);
+                TClientHandler thcwc = new TClientHandler(serverSocketClient, disServer, dosServer);
                 // starting
                 thcwc.start();
                 thcwc.join();

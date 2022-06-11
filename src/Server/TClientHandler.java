@@ -5,14 +5,13 @@ import Messages.Request;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static Server.Server.*;
 
 /**
  * Creates the answer to the requests made and sends said answer to the client that made the request
  */
-public class TServer2Client extends Thread{
+public class TClientHandler extends Thread{
     private static final int TIMEPERITERATION = 1;
 
     //create socket
@@ -23,7 +22,7 @@ public class TServer2Client extends Thread{
     /**
      * Constructor
      */
-    public TServer2Client(){
+    public TClientHandler(){
 
     }
 

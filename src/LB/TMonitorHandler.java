@@ -6,15 +6,15 @@ import java.io.*;
 import java.net.Socket;
 
 public class TMonitorHandler extends Thread{
-    private Socket socket;
-    private ObjectOutputStream out;
-    private ObjectInputStream in;
+    private Socket monitorSocket;
+    private ObjectOutputStream oos;
+    private ObjectInputStream ois;
 
 
     public TMonitorHandler(Socket monitorSocket, ObjectOutputStream outMonitor, ObjectInputStream inMonitor){
-        this.socket = monitorSocket;
-        this.out = outMonitor;
-        this.in = inMonitor;
+        this.monitorSocket = monitorSocket;
+        this.oos = outMonitor;
+        this.ois = inMonitor;
     }
 
     /**
@@ -27,19 +27,19 @@ public class TMonitorHandler extends Thread{
 
                 Request request = new Request(1, 2, 3, 4, 5, 6, 7, "127.0.0.1", 8080);
 
-                out.writeObject(request);
+                oos.writeObject(request);
 
                 request = new Request(1, 2, 3, 4, 5, 6, -1, "127.0.0.1", 8080);
-                out.writeObject(request);
+                oos.writeObject(request);
                 System.out.println("sent end deadline ");
 
-                out.flush();
+                oos.flush();
 
                 // Exiting from a while loo should be done when a client gives a deadline of -1.
                 if(request.getDeadline() == -1)
                 {
-                    System.out.println("Connection closing... : " + socket);
-                    socket.close();
+                    System.out.println("Connection closing... : " + monitorSocket);
+                    monitorSocket.close();
                     System.out.println("Closed");
                 }
 
@@ -56,9 +56,9 @@ public class TMonitorHandler extends Thread{
      */
     private void terminateClient(){
         try {
-            in.close();
-            out.close();
-            socket.close();
+            ois.close();
+            oos.close();
+            monitorSocket.close();
 
         } catch (IOException e) {
             throw new RuntimeException(e);

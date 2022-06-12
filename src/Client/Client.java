@@ -16,7 +16,7 @@ public class Client {
     /**
      * Tasks to be done by a client
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         int nr_requests_to_do = 2;
 
@@ -27,27 +27,32 @@ public class Client {
         listRequest.add(request);
 
         //TMonitorHandlerFromServer block of code
-        System.out.println("Connection with monitor");
-        Socket serverSocket = null;
-        try {
-            serverSocket = new Socket("localhost", 9090);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            ObjectOutputStream dosServer = new ObjectOutputStream(serverSocket.getOutputStream());
-            ObjectInputStream disServer = new ObjectInputStream(serverSocket.getInputStream());
-            System.out.println("Starting thread !");
+//        System.out.println("Connection with monitor");
+//        Socket serverSocket = null;
+//        try {
+//            serverSocket = new Socket("localhost", 9090);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        try {
+//            ObjectOutputStream dosServer = new ObjectOutputStream(serverSocket.getOutputStream());
+//            ObjectInputStream disServer = new ObjectInputStream(serverSocket.getInputStream());
+//            System.out.println("Starting thread !");
+//
+//            //starts the threads
+//            TLoadBalancerHandler tserver = new TLoadBalancerHandler(serverSocket, dosServer, disServer, listRequest);
+//            System.out.println("Thread linked to Monitor");
+//            tserver.start();
+//            tserver.join();
+//
+//        }catch (Exception e){
+//
+//        }
 
-            //starts the threads
-            TLoadBalancerHandler tserver = new TLoadBalancerHandler(serverSocket, dosServer, disServer, listRequest);
-            System.out.println("Thread linked to Monitor");
-            tserver.start();
-            tserver.join();
-
-        }catch (Exception e){
-
-        }
+        Socket lbSocket = new Socket("localhost", 22222);
+        ObjectOutputStream oos = new ObjectOutputStream(lbSocket.getOutputStream());
+        oos.writeObject(request);
+        System.out.println("Request sent to LB !");
 
     }
 

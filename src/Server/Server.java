@@ -118,7 +118,7 @@ public class Server {
 
         //TMonitorHandlerFromServer block of code
         System.out.println("Connection with monitor");
-        Socket serverSocket = new Socket("localhost", 5057);
+        Socket serverSocket = new Socket("localhost", 5056);
         try {
             ObjectOutputStream dosServer = new ObjectOutputStream(serverSocket.getOutputStream());
             ObjectInputStream disServer = new ObjectInputStream(serverSocket.getInputStream());
@@ -126,7 +126,7 @@ public class Server {
             TMonitorHandler tserver = new TMonitorHandler(serverSocket, dosServer, disServer);
             System.out.println("Thread linked to Monitor");
             tserver.start();
-            tserver.join();
+//            tserver.join();
         }catch (Exception e){
 
         }

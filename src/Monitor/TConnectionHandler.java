@@ -23,6 +23,7 @@ public class TConnectionHandler extends Thread{
         this.oos = new ObjectOutputStream(socket.getOutputStream());
 
         Request req = (Request) ois.readObject();
+        System.out.println("I read a request - " + req.getCode());
 
         //Closing connection
         if(req.getDeadline() == -1)
@@ -37,7 +38,7 @@ public class TConnectionHandler extends Thread{
         }
 
         //Load balancer connection
-        if(req.getCode() == 6){
+        if(req.getCode() == 1){ //TODO - check the code
             System.out.println("Connection with LB made !!");
 //            while(true){
                 LoadBalancer.addRequest(req);

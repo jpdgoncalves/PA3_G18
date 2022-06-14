@@ -1,10 +1,12 @@
 package Messages;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServerStateMessage {
+public class ServerStateMessage implements Serializable {
+    //serverId, ServerStatus
     HashMap<Integer, ServerStatus> requestsPerServers = new HashMap<>();
 
     public ServerStateMessage(){
@@ -32,4 +34,13 @@ public class ServerStateMessage {
         return serverIdWithLessOccupation;
     }
 
+    @Override
+    public String toString() {
+        String tmp = "";
+        for (Map.Entry<Integer, ServerStatus> entry : requestsPerServers.entrySet()){
+            tmp += "\nserverId = " + entry.getKey() + " has server status : <" + entry.getValue() + ">";
+        }
+
+        return tmp;
+    }
 }

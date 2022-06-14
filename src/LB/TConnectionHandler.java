@@ -56,17 +56,17 @@ public class TConnectionHandler extends Thread{
 
             //receives response from monitor
             ObjectInputStream oisMonitor = new ObjectInputStream(socketToMonitor.getInputStream());
-            System.out.println("I received an answer from the monitor");
             ServerStateMessage serverState = (ServerStateMessage) oisMonitor.readObject();
+            System.out.println("I received an answer from the monitor");
             //close connection with monitor
             socketToMonitor.close();
             oosMonitor.close();
             oisMonitor.close();
-            System.out.println("Message to montiro sent\n Now openning connection with server");
 
 
             //this is the server with less occupation
             ServerStatus serverId = serverState.getServerWithLessOccupation();
+            System.out.println("Message to monitor sent\n Now openning connection with server");
             //open connection with less occupied server
             Socket serverSocket = new Socket(serverId.getIp(), serverId.getPort());
             ObjectOutputStream oosServer = new ObjectOutputStream(socketToMonitor.getOutputStream());

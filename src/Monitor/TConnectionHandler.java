@@ -1,6 +1,8 @@
 package Monitor;
 
 import Messages.Request;
+import Messages.ServerStateMessage;
+import Messages.ServerStatus;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,6 +14,8 @@ public class TConnectionHandler extends Thread{
     Socket socket;
     ObjectOutputStream oos;
     ObjectInputStream ois;
+
+    ServerStateMessage serverStateMessage;
 
     public TConnectionHandler(Socket socket){
         this.socket = socket;
@@ -38,43 +42,42 @@ public class TConnectionHandler extends Thread{
 
         //Client request connection
         if(req.getCode() == 1){
-            System.out.println("Connection with LB made - receiving client request!!");
+            System.out.println("Connection with LB made - receiving client request :");
+            System.out.println(req);
+            Monitor.addRequest(req);
 
-                Monitor.addRequest(req);
-                System.out.println(req);
-                oos.flush();
+            ServerStateMessage ssm = new ServerStateMessage();
+            ServerStatus serverStatus = new ServerStatus("localhost", 5058, 1);
+            ssm.addServer(1, serverStatus);
+            System.out.println("ServerStateMessage sends to LB : " + ssm);
+            oos.writeObject(ssm);
 
+            oos.flush();
         }
 
         //LB up connection
         if(req.getCode() == 6){
             System.out.println("Connection with LB made - LB up!!");
-//            while(true){
             Monitor.addRequest(req);
             System.out.println(req);
             oos.flush();
-//            }
         }
 
 
         //Server up connection
         if (req.getCode() == 7) {
             System.out.println("Connection with Server made - server up!!");
-//            while(true){
                 Monitor.addRequest(req);
                 System.out.println(req);
                 oos.flush();
-//            }
         }
 
         //Heartbeat reply
         if(req.getCode() == 5){
             System.out.println("Heartbeat received!!");
-//            while(true){
             Monitor.addRequest(req);
             System.out.println(req);
             oos.flush();
-//            }
         }
     }
 
@@ -91,10 +94,5 @@ public class TConnectionHandler extends Thread{
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-//        try {
-//            closeConnections();
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 }

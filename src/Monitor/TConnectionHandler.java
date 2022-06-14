@@ -1,6 +1,5 @@
 package Monitor;
 
-import LB.LoadBalancer;
 import Messages.Request;
 
 import java.io.IOException;
@@ -37,22 +36,44 @@ public class TConnectionHandler extends Thread{
             return;
         }
 
-        //Load balancer connection
-        if(req.getCode() == 1){ //TODO - check the code
-            System.out.println("Connection with LB made !!");
+        //Client request connection
+        if(req.getCode() == 1){
+            System.out.println("Connection with LB made - receiving client request!!");
+
+                Monitor.addRequest(req);
+                System.out.println(req);
+                oos.flush();
+
+        }
+
+        //LB up connection
+        if(req.getCode() == 6){
+            System.out.println("Connection with LB made - LB up!!");
 //            while(true){
-                LoadBalancer.addRequest(req);
+            Monitor.addRequest(req);
+            System.out.println(req);
+            oos.flush();
+//            }
+        }
+
+
+        //Server up connection
+        if (req.getCode() == 7) {
+            System.out.println("Connection with Server made - server up!!");
+//            while(true){
+                Monitor.addRequest(req);
                 System.out.println(req);
                 oos.flush();
 //            }
         }
-        //Server connection
-        else if (req.getCode() == 7) {
-            System.out.println("Connection with Server made !!");
+
+        //Heartbeat reply
+        if(req.getCode() == 5){
+            System.out.println("Heartbeat received!!");
 //            while(true){
-                LoadBalancer.addRequest(req);
-                System.out.println(req);
-                oos.flush();
+            Monitor.addRequest(req);
+            System.out.println(req);
+            oos.flush();
 //            }
         }
     }

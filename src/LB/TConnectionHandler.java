@@ -7,9 +7,7 @@ import Messages.ServerStatus;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
 
 public class TConnectionHandler extends Thread{
 
@@ -69,8 +67,10 @@ public class TConnectionHandler extends Thread{
             System.out.println("Message to monitor sent\n Now openning connection with server");
             //open connection with less occupied server
             Socket serverSocket = new Socket(serverId.getIp(), serverId.getPort());
-            ObjectOutputStream oosServer = new ObjectOutputStream(socketToMonitor.getOutputStream());
+            ObjectOutputStream oosServer = new ObjectOutputStream(serverSocket.getOutputStream());
+            System.out.println("server to forward to is : " + serverId);
             oosServer.writeObject(req);
+            System.out.println("I finished forwarding my request to Server !");
 
             //close connection with server
             serverSocket.close();

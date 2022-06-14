@@ -2,7 +2,8 @@ package Server;
 
 import Messages.Request;
 
-import java.io.*;
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -91,11 +92,11 @@ public class Server {
         request_list = new PriorityBlockingQueue<>(2, Comparator.comparingInt(Request::getDeadline));
 
         //create requests for test
-        Request request = new Request(1, 2, 3, 4, 5, 6, 7, "127.0.0.1", 8080);
-        Request request2 = new Request(1, 2, 3, 4, 2, 6, 3, "127.0.0.1", 8080);
+//        Request request = new Request(1, 2, 3, 4, 5, 6, 7, "127.0.0.1", 8080);
+//        Request request2 = new Request(1, 2, 3, 4, 2, 6, 3, "127.0.0.1", 8080);
 
-        request_list.add(request);
-        request_list.add(request2);
+//        request_list.add(request);
+//        request_list.add(request2);
 
         /** -------NOTES-------
          *
@@ -117,16 +118,28 @@ public class Server {
 //        }
 
         //TMonitorHandlerFromServer block of code
-        System.out.println("Connection with monitor");
-        Socket serverSocket = new Socket("localhost", 5056);
+//        System.out.println("Connection with monitor");
+//        Socket serverSocket = new Socket("localhost", 5056);
+//        try {
+//            ObjectOutputStream dosServer = new ObjectOutputStream(serverSocket.getOutputStream());
+//            ObjectInputStream disServer = new ObjectInputStream(serverSocket.getInputStream());
+//            System.out.println("Starting thread !");
+//            TMonitorHandler tserver = new TMonitorHandler(serverSocket, dosServer, disServer);
+//            System.out.println("Thread linked to Monitor");
+//            tserver.start();
+//        }catch (Exception e){
+//
+//        }
+
+
         try {
-            ObjectOutputStream dosServer = new ObjectOutputStream(serverSocket.getOutputStream());
-            ObjectInputStream disServer = new ObjectInputStream(serverSocket.getInputStream());
-            System.out.println("Starting thread !");
-            TMonitorHandler tserver = new TMonitorHandler(serverSocket, dosServer, disServer);
-            System.out.println("Thread linked to Monitor");
-            tserver.start();
-//            tserver.join();
+            ServerSocket serverSocket = new ServerSocket(5058);
+            while(true){
+                Socket socket = serverSocket.accept();
+                TConnectionHandler thread = new TConnectionHandler(socket);
+                System.out.println("connection made !");
+                thread.start();
+            }
         }catch (Exception e){
 
         }

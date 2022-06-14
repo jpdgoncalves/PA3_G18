@@ -1,8 +1,7 @@
-package Monitor;
+package Server;
 
 import Messages.Request;
 import Messages.ServerStateMessage;
-import Messages.ServerStatus;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -25,7 +24,7 @@ public class TConnectionHandler extends Thread{
         this.oos = new ObjectOutputStream(socket.getOutputStream());
 
         Request req = (Request) ois.readObject();
-        System.out.println("I read a request - " + req.getCode());
+        System.out.println("I got a request - " + req.getCode());
 
         //Closing connection
         if(req.getDeadline() == -1)
@@ -43,13 +42,7 @@ public class TConnectionHandler extends Thread{
         if(req.getCode() == 1){
             System.out.println("Connection with LB made - receiving client request :");
             System.out.println(req);
-            Monitor.addRequest(req);
-
-            ServerStateMessage ssm = new ServerStateMessage();
-            ServerStatus serverStatus = new ServerStatus("localhost", 5058, 1);
-            ssm.addServer(1, serverStatus);
-            System.out.println("ServerStateMessage sends to LB : " + ssm);
-            oos.writeObject(ssm);
+            Server.addRequest(req);
 
             oos.flush();
         }
@@ -57,7 +50,7 @@ public class TConnectionHandler extends Thread{
         //LB up connection
         if(req.getCode() == 6){
             System.out.println("Connection with LB made - LB up!!");
-            Monitor.addRequest(req);
+            Server.addRequest(req);
             System.out.println(req);
             oos.flush();
         }
@@ -66,15 +59,15 @@ public class TConnectionHandler extends Thread{
         //Server up connection
         if (req.getCode() == 7) {
             System.out.println("Connection with Server made - server up!!");
-                Monitor.addRequest(req);
-                System.out.println(req);
-                oos.flush();
+            Server.addRequest(req);
+            System.out.println(req);
+            oos.flush();
         }
 
         //Heartbeat reply
         if(req.getCode() == 5){
             System.out.println("Heartbeat received!!");
-            Monitor.addRequest(req);
+            Server.addRequest(req);
             System.out.println(req);
             oos.flush();
         }

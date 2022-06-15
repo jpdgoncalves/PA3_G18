@@ -1,10 +1,12 @@
 package Client;
 
 import Messages.Request;
+import Server.TConnectionHandler;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
 
@@ -12,6 +14,13 @@ import java.util.LinkedList;
  * Client class
  */
 public class Client {
+
+    private static LinkedList <Request> listRequests = new LinkedList<>();
+
+
+    public static void addRequest(Request request) {
+        listRequests.add(request);
+    }
 
     /**
      * Tasks to be done by a client
@@ -21,38 +30,29 @@ public class Client {
         int nr_requests_to_do = 2;
 
         //creates requests
-        Request request = new Request(1, 1, 1, 01, 2, 0, 2, "127.0.0.1", 5000);
+        Request request = new Request(1, 1, 1, 01, 2, 0, 2, "127.0.0.1", 5055);
         LinkedList<Request> listRequest = new LinkedList<>();
         listRequest.add(request);
         listRequest.add(request);
 
-        //TMonitorHandlerFromServer block of code
-//        System.out.println("Connection with monitor");
-//        Socket serverSocket = null;
-//        try {
-//            serverSocket = new Socket("localhost", 9090);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        try {
-//            ObjectOutputStream dosServer = new ObjectOutputStream(serverSocket.getOutputStream());
-//            ObjectInputStream disServer = new ObjectInputStream(serverSocket.getInputStream());
-//            System.out.println("Starting thread !");
-//
-//            //starts the threads
-//            TLoadBalancerHandler tserver = new TLoadBalancerHandler(serverSocket, dosServer, disServer, listRequest);
-//            System.out.println("Thread linked to Monitor");
-//            tserver.start();
-//            tserver.join();
-//
-//        }catch (Exception e){
-//
-//        }
 
-        Socket lbSocket = new Socket("localhost", 22222);
-        ObjectOutputStream oos = new ObjectOutputStream(lbSocket.getOutputStream());
-        oos.writeObject(request);
-        System.out.println("Request sent to LB !");
+        try {
+            ServerSocket serverSocket = new ServerSocket(5055);
+//            while(true){
+                //connection with LB
+                Socket lbSocket = new Socket("localhost", 22222);
+                ObjectOutputStream oos = new ObjectOutputStream(lbSocket.getOutputStream());
+                oos.writeObject(request);
+                System.out.println("Request sent to LB !");
+                //create connection with server
+                Socket socket = serverSocket.accept();
+                TServerHandler thread = new TServerHandler(socket);
+                System.out.println("connection made with server!");
+                thread.start();
+//            }
+        }catch (Exception e){
+
+        }
 
     }
 

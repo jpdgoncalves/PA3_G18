@@ -13,8 +13,6 @@ public class TConnectionHandler extends Thread{
     ObjectOutputStream oos;
     ObjectInputStream ois;
 
-    ServerStateMessage serverStateMessage;
-
     public TConnectionHandler(Socket socket){
         this.socket = socket;
     }
@@ -43,6 +41,14 @@ public class TConnectionHandler extends Thread{
             System.out.println("Connection with LB made - receiving client request :");
             System.out.println(req);
             Server.addRequest(req);
+            Socket clientSocket = new Socket(req.getTarget_IP(), req.getTargetPort());
+            ObjectOutputStream oosClient = new ObjectOutputStream(clientSocket.getOutputStream());
+            //TODO: change reply with the real serverID and chnage pi for a double
+            Request reply = new Request(req.getClientId(), req.getRequestId(), 2020, 02, req.getNr_iterations(), 3, req.getDeadline(), req.getTarget_IP(), req.getTargetPort());
+            oosClient.writeObject(reply);
+
+            oosClient.close();
+            clientSocket.close();
 
             oos.flush();
         }

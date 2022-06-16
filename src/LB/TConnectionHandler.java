@@ -19,10 +19,20 @@ public class TConnectionHandler extends Thread{
     private final int monitorPort = 5056;
 
 
+    /**
+     * TConnectionHandler constructor
+     * @param socket
+     */
     public TConnectionHandler(Socket socket){
         this.socket = socket;
     }
 
+    /**
+     * Receives a request and treats it accordingly
+     *
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public void startConnection() throws IOException, ClassNotFoundException {
         this.ois = new ObjectInputStream(socket.getInputStream());
         this.oos = new ObjectOutputStream(socket.getOutputStream());
@@ -65,32 +75,49 @@ public class TConnectionHandler extends Thread{
             //this is the server with less occupation
             ServerStatus serverId = serverState.getServerWithLessOccupation();
             System.out.println("Message to monitor sent\n Now openning connection with server");
-            //open connection with less occupied server
-            Socket serverSocket = new Socket(serverId.getIp(), serverId.getPort());
-            ObjectOutputStream oosServer = new ObjectOutputStream(serverSocket.getOutputStream());
-            System.out.println("server to forward to is : " + serverId);
-            oosServer.writeObject(req);
-            System.out.println("I finished forwarding my request to Server !");
-
-            //close connection with server
-            serverSocket.close();
-            oosServer.close();
-            System.out.println("server connection finished");
-
+            System.out.println("SERVER ID ->" + serverId);
+            if (serverId != null) {
+                //open connection with less occupied server
+                Socket serverSocket = new Socket(serverId.getIp(), serverId.getPort());
+                ObjectOutputStream oosServer = new ObjectOutputStream(serverSocket.getOutputStream());
+                System.out.println("server to forward to is : " + serverId);
+                oosServer.writeObject(req);
+                System.out.println("I finished forwarding my request to Server !");
+                //close connection with server
+                serverSocket.close();
+                oosServer.close();
+                System.out.println("server connection finished");
+            }else{
+                System.out.println("No servers available.");
+            }
 
             LoadBalancer.addRequest(req);
             oos.flush();
         }
         //TODO: check if connection is from monitor with this code
-        else if (req.getCode() == 4) { //receivess heartbeat
+        else if (req.getCode() == 4) { //receives heartbeat
             System.out.println("Connection with Monitor made !!");
-            LoadBalancer.addRequest(req);
+            //LoadBalancer.addRequest(req);
+
+            //open connection with monitor to reply to heartbeat
+            Socket socketToMonitor = new Socket(monitorIP, monitorPort);
+            ObjectOutputStream oosMonitor = new ObjectOutputStream(socketToMonitor.getOutputStream());
+            req.setCode(5); //reply to heartbeat code
+            oosMonitor.writeObject(req);
+
+            //close connection with monitor
+            socketToMonitor.close();
+            oosMonitor.close();
+
             oos.flush();
         }
 
 
     }
 
+    /**
+     * Life cycle of the thread
+     */
     @Override
     public void run() {
         try {

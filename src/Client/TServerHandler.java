@@ -11,7 +11,7 @@ import java.net.Socket;
 public class TServerHandler extends Thread {
 
     Socket socket;
-    ObjectOutputStream oos;
+    //ObjectOutputStream oos;
     ObjectInputStream ois;
 
     public TServerHandler(Socket socket){
@@ -20,7 +20,7 @@ public class TServerHandler extends Thread {
 
     private void startConnection() throws IOException, ClassNotFoundException {
         this.ois = new ObjectInputStream(socket.getInputStream());
-        this.oos = new ObjectOutputStream(socket.getOutputStream());
+        //this.oos = new ObjectOutputStream(socket.getOutputStream());
 
         Request req = (Request) ois.readObject();
         System.out.println("I got a request - " + req.getCode());
@@ -31,7 +31,7 @@ public class TServerHandler extends Thread {
             System.out.println("Client " + this.socket + " sends exit...");
             System.out.println("Connection closing...");
             this.socket.close();
-            this.oos.close();
+            //this.oos.close();
             this.ois.close();
             System.out.println("Closed");
             return;
@@ -43,17 +43,17 @@ public class TServerHandler extends Thread {
             System.out.println(req);
             Client.addRequest(req);
             socket.close();
-            oos.close();
+            //oos.close();
             ois.close();
 
-            oos.flush();
+            //oos.flush();
         }
 
     }
 
     private void closeConnections() throws IOException {
 //        serverSocket.close();
-        oos.close();
+        //oos.close();
         ois.close();
     }
 

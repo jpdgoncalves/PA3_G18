@@ -10,7 +10,7 @@ import java.net.Socket;
 
 public class TConnectionHandler extends Thread{
     Socket socket;
-    ObjectOutputStream oos;
+    //ObjectOutputStream oos;
     ObjectInputStream ois;
 
     public TConnectionHandler(Socket socket){
@@ -19,7 +19,7 @@ public class TConnectionHandler extends Thread{
 
     private void startConnection() throws IOException, ClassNotFoundException {
         this.ois = new ObjectInputStream(socket.getInputStream());
-        this.oos = new ObjectOutputStream(socket.getOutputStream());
+        //this.oos = new ObjectOutputStream(socket.getOutputStream());
 
         Request req = (Request) ois.readObject();
         System.out.println("I got a request - " + req.getCode());
@@ -30,7 +30,7 @@ public class TConnectionHandler extends Thread{
             System.out.println("Client " + this.socket + " sends exit...");
             System.out.println("Connection closing...");
             this.socket.close();
-            this.oos.close();
+            //this.oos.close();
             this.ois.close();
             System.out.println("Closed");
             return;
@@ -50,7 +50,7 @@ public class TConnectionHandler extends Thread{
             oosClient.close();
             clientSocket.close();
 
-            oos.flush();
+            //oos.flush();
         }
 
         //LB up connection
@@ -58,7 +58,7 @@ public class TConnectionHandler extends Thread{
             System.out.println("Connection with LB made - LB up!!");
             Server.addRequest(req);
             System.out.println(req);
-            oos.flush();
+            //oos.flush();
         }
 
 
@@ -67,7 +67,7 @@ public class TConnectionHandler extends Thread{
             System.out.println("Connection with Server made - server up!!");
             Server.addRequest(req);
             System.out.println(req);
-            oos.flush();
+            //oos.flush();
         }
 
         //Heartbeat reply
@@ -75,13 +75,13 @@ public class TConnectionHandler extends Thread{
             System.out.println("Heartbeat received!!");
             Server.addRequest(req);
             System.out.println(req);
-            oos.flush();
+            //oos.flush();
         }
     }
 
     private void closeConnections() throws IOException {
 //        serverSocket.close();
-        oos.close();
+        //oos.close();
         ois.close();
     }
 

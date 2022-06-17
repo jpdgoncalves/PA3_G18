@@ -3,6 +3,7 @@ package Server;
 import Messages.Request;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Comparator;
@@ -44,7 +45,17 @@ public class Server {
          */
 
         try {
-            ServerSocket serverSocket = new ServerSocket(5058);
+
+
+            int ServerSocketPort = 5058;
+            ServerSocket serverSocket = new ServerSocket(ServerSocketPort);
+
+            //send to monitor with my port and IP
+            Socket socketup = new Socket("127.0.0.1", 5056);
+            ObjectOutputStream oos = new ObjectOutputStream(socketup.getOutputStream());
+            oos.writeObject(new Request(0,0,0,7,0,0,0,  "127.0.0.1" , ServerSocketPort));
+
+
             while(true){
                 Socket socket = serverSocket.accept();
                 TConnectionHandler thread = new TConnectionHandler(socket);

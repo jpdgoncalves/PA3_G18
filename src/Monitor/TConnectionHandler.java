@@ -29,7 +29,7 @@ public class TConnectionHandler extends Thread{
      */
     private void startConnection() throws IOException, ClassNotFoundException {
         this.ois = new ObjectInputStream(socket.getInputStream());
-        this.oos = new ObjectOutputStream(socket.getOutputStream());
+        //this.oos = new ObjectOutputStream(socket.getOutputStream());
 
         Request req = (Request) ois.readObject();
         System.out.println("I read a request - " + req.getCode());
@@ -59,28 +59,30 @@ public class TConnectionHandler extends Thread{
             System.out.println("ServerStateMessage sends to LB : " + ssm);
             oos.writeObject(ssm);
 
-            oos.flush();
+            //oos.flush();
         }
 
         //LB up connection
         if(req.getCode() == 6){
             System.out.println("Connection with LB made - LB up!!");
             //add LB to a list of LBs
-            LBStatus lbst = new LBStatus(socket.getInetAddress().getHostAddress(), socket.getPort(), 1, 0);
-            Monitor.addLB(socket.getInetAddress().getHostAddress() + socket.getPort(), lbst);
+            LBStatus lbst = new LBStatus(req.getTarget_IP(), req.getTargetPort(), 1, 0);
+            Monitor.addLB(req.getTarget_IP() + req.getTargetPort(), lbst);
+            System.out.println("listLB.size() - " + Monitor.getListLB().size());
             System.out.println(lbst);
-            oos.flush();
+            //oos.flush();
         }
 
 
         //Server up connection
         if (req.getCode() == 7) {
-            System.out.println("Connection with Server made - server up!!");
-            //add server to a list of servers
-            ServerStatus st = new ServerStatus(socket.getInetAddress().getHostAddress(), socket.getPort(), 1, 0);
-            Monitor.addServer(socket.getInetAddress().getHostAddress() + socket.getPort(), st);
-            System.out.println(st);
-            oos.flush();
+            System.out.println("Connection with srv made - SRV up!!");
+            //add LB to a list of LBs
+            ServerStatus lbst = new ServerStatus(req.getTarget_IP(), req.getTargetPort(), 1, 0);
+            Monitor.addServer(req.getTarget_IP() + req.getTargetPort(), lbst);
+            System.out.println("listSRV.size() - " + Monitor.getListServers().size());
+            System.out.println(lbst);
+            //oos.flush();
         }
 
         //Heartbeat reply - TODO test
@@ -111,7 +113,7 @@ public class TConnectionHandler extends Thread{
             }
 
             System.out.println(req);
-            oos.flush();
+            //oos.flush();
         }
     }
 

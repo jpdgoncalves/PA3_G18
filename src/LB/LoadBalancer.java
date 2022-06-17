@@ -19,7 +19,15 @@ public class LoadBalancer {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        ServerSocket lbServerSocket = new ServerSocket(22222);
+
+        int ServerSocketPort = 22222;
+        ServerSocket lbServerSocket = new ServerSocket(ServerSocketPort);
+
+        //send to monitor with my port and IP
+        Socket socketup = new Socket("127.0.0.1", 5056);
+        ObjectOutputStream oos = new ObjectOutputStream(socketup.getOutputStream());
+        oos.writeObject(new Request(0,0,0,6,0,0,0,  "127.0.0.1" , ServerSocketPort));
+
         while(true){
             Socket socket = lbServerSocket.accept();
             TConnectionHandler thread = new TConnectionHandler(socket);

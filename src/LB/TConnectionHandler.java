@@ -38,6 +38,7 @@ public class TConnectionHandler extends Thread{
         this.oos = new ObjectOutputStream(socket.getOutputStream());
 
         Request req = (Request) ois.readObject();
+        System.out.println("I got code - " + req.getCode());
 
         //Closing connection
         if(req.getDeadline() == -1)
@@ -97,19 +98,17 @@ public class TConnectionHandler extends Thread{
         //TODO: check if connection is from monitor with this code
         else if (req.getCode() == 4) { //receives heartbeat
             System.out.println("Connection with Monitor made !!");
-            //LoadBalancer.addRequest(req);
 
-            //open connection with monitor to reply to heartbeat
+            //send to monitor with my port and IP
             Socket socketToMonitor = new Socket(monitorIP, monitorPort);
-            ObjectOutputStream oosMonitor = new ObjectOutputStream(socketToMonitor.getOutputStream());
-            req.setCode(5); //reply to heartbeat code
-            oosMonitor.writeObject(req);
+            ObjectOutputStream oos = new ObjectOutputStream(socketToMonitor.getOutputStream());
+            oos.writeObject(new Request(0,0,0,5,0,0,0,  socketToMonitor.getInetAddress().getHostAddress(), socketToMonitor.getPort()));
 
             //close connection with monitor
             socketToMonitor.close();
-            oosMonitor.close();
-
             oos.flush();
+            oos.close();
+
         }
 
 

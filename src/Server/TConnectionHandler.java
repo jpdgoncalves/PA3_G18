@@ -13,6 +13,9 @@ public class TConnectionHandler extends Thread{
     //ObjectOutputStream oos;
     ObjectInputStream ois;
 
+    private final String monitorIP = "localhost";
+    private final int monitorPort = 5056;
+
     public TConnectionHandler(Socket socket){
         this.socket = socket;
     }
@@ -53,8 +56,23 @@ public class TConnectionHandler extends Thread{
             //oos.flush();
         }
 
+         else if (req.getCode() == 4) { //receives heartbeat
+            System.out.println("Connection with Monitor made !!");
+
+            //send to monitor with my port and IP
+            Socket socketToMonitor = new Socket(monitorIP, monitorPort);
+            ObjectOutputStream oos = new ObjectOutputStream(socketToMonitor.getOutputStream());
+            oos.writeObject(new Request(0,0,0,5,0,0,0,  socketToMonitor.getInetAddress().getHostAddress(), socketToMonitor.getPort()));
+
+            //close connection with monitor
+            socketToMonitor.close();
+            oos.flush();
+            oos.close();
+
+        }
+
         //LB up connection
-        if(req.getCode() == 6){
+        /*if(req.getCode() == 6){
             System.out.println("Connection with LB made - LB up!!");
             Server.addRequest(req);
             System.out.println(req);
@@ -76,7 +94,7 @@ public class TConnectionHandler extends Thread{
             Server.addRequest(req);
             System.out.println(req);
             //oos.flush();
-        }
+        }*/
     }
 
     private void closeConnections() throws IOException {

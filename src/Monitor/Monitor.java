@@ -30,6 +30,7 @@ public class Monitor {
      */
     public static void addServer(String IPandPort, ServerStatus svst) {
         listServers.put(IPandPort, svst);
+        System.out.println("listServers.size() - " + listServers.size());
     }
 
     /**
@@ -72,14 +73,12 @@ public class Monitor {
     public static void main(String[] args) throws IOException, InterruptedException {
         ServerSocket serverSocket = new ServerSocket(5056);
 
-        //TODO - not working because it is sharing the socket I guess
-        //THeartbeatChecker hbck = new THeartbeatChecker(5, serverSocket);
-        //hbck.run();
+        //TODO - not working
+        THeartbeatChecker hbck = new THeartbeatChecker(5);
+        hbck.start();
 
         while(true){
-            System.out.println("test");
             Socket socket = serverSocket.accept();
-            System.out.println("connection made !");
             TConnectionHandler thread = new TConnectionHandler(socket);
             thread.start();
         }

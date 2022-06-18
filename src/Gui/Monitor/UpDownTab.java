@@ -7,11 +7,11 @@ import javax.swing.*;
 class UpDownTab extends JPanel {
     private final TablePanel lbsTable = new TablePanel(
             "Load Balancers",
-            new String[] {"IP", "Port", "Id", "Primary", "Status"}
+            new String[] {"Id", "IP", "Port", "Primary", "Status"}
     );
     private final TablePanel serversTable = new TablePanel(
             "Servers",
-            new String[] {"IP", "Port", "Id", "Status"}
+            new String[] {"Id", "IP", "Port", "Status"}
     );
 
     public UpDownTab() {

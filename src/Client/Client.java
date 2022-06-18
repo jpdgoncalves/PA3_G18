@@ -51,14 +51,11 @@ public class Client {
      */
     public static void main(String[] args) throws IOException {
 
-        int nr_requests_to_do = 2;
-
         //creates requests
         Request request = new Request(1, 5, 1, 01, 2, 0, 2, "127.0.0.1", 5055);
         LinkedList<Request> listRequest = new LinkedList<>();
         listRequest.add(request);
         listRequest.add(request);
-
 
         try {
             gui.setVisible(true);
@@ -69,7 +66,5 @@ public class Client {
         }catch (Exception e){
 
         }
-
     }
-
 }

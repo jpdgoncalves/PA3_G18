@@ -66,6 +66,7 @@ public class TConnectionHandler extends Thread{
             //receives response from monitor
             ObjectInputStream oisMonitor = new ObjectInputStream(socketToMonitor.getInputStream());
             ServerStateMessage serverState = (ServerStateMessage) oisMonitor.readObject();
+            //TODO: make the monitor inform about if there already is a LB running (in this case, the second one will be the secondary)
             System.out.println("I received an answer from the monitor");
             //close connection with monitor
             socketToMonitor.close();

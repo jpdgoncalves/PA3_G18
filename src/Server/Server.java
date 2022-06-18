@@ -16,6 +16,10 @@ public class Server {
 
     //Priority Blocking Queue for the requests
     public static PriorityBlockingQueue<Request> request_list;
+    private final static int ServerSocketPort = 5058;
+    public static int getServerSocketPort() {
+        return ServerSocketPort;
+    }
 
     /**
      * Adds a request to the request list if the list is not full and returns an error if it is full.
@@ -47,7 +51,7 @@ public class Server {
         try {
 
 
-            int ServerSocketPort = 5058;
+
             ServerSocket serverSocket = new ServerSocket(ServerSocketPort);
 
             //send to monitor with my port and IP

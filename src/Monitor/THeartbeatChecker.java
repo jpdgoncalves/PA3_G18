@@ -30,7 +30,7 @@ public class THeartbeatChecker extends Thread{
 
         //check servers
         Object[] keysSrv = Monitor.getListServers().keySet().toArray();
-        System.out.println("keysSRV.length -> " + keysSrv.length);
+        //System.out.println("keysSRV.length -> " + keysSrv.length);
         if (keysSrv.length != 0) {
 
             for (int i = 0; i < keysSrv.length; i++) {
@@ -41,11 +41,16 @@ public class THeartbeatChecker extends Thread{
                 int send_port = value.getPort();
                 System.out.println("Sending to IP - " + send_ip + "  port - " + send_port);
 
+                //new heartbeat
+                value.setHeartbeat(value.getHeartbeat() + 1);
+                //set it on its place
+                Monitor.setServer(keysSrv[i].toString(), value);
+
                 Socket socket = new Socket(send_ip, send_port);
                 ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
                 oos.writeObject(new Request(0,0,0,4,0,0,0, "", 0));
 
-                System.out.println("?<-Heartbeat srv");
+                //System.out.println("?<-Heartbeat srv");
 
 
             }
@@ -54,7 +59,7 @@ public class THeartbeatChecker extends Thread{
 
         //check LBs
         Object[] keysLB = Monitor.getListLB().keySet().toArray();
-        System.out.println("keysLB.length -> " + keysLB.length);
+        //System.out.println("keysLB.length -> " + keysLB.length);
         if (keysLB.length != 0) {
             for (int i = 0; i < keysLB.length; i++) {
 
@@ -64,11 +69,24 @@ public class THeartbeatChecker extends Thread{
                 int send_port = value.getPort();
                 System.out.println("Sending to IP - " + send_ip + "  port - " + send_port);
 
-                Socket socket = new Socket(send_ip, send_port);
+                //new heartbeat
+                value.setHeartbeat(value.getHeartbeat() + 1);
+                //set it on its place
+                Monitor.setLB(keysLB[i].toString(), value);
+
+                Socket socket = null;
+                try {
+                    socket = new Socket(send_ip, send_port);
+                } catch (RuntimeException r){
+
+                }
+
                 ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
                 oos.writeObject(new Request(0,0,0,4,0,0,0, "", 0));
 
-                System.out.println("?<-Heartbeat LB");
+                //System.out.println("?<-Heartbeat LB");
+
+                System.out.println("new hb val - " + Monitor.getListLB().get(keysLB[i]).getHeartbeat());
 
             }
         }

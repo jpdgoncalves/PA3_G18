@@ -9,6 +9,12 @@ import java.util.LinkedList;
 
 public class LoadBalancer {
 
+    private final static int ServerSocketPort = 22222;
+
+    public static int getServerSocketPort() {
+        return ServerSocketPort;
+    }
+
     private static LinkedList <Request> listRequests = new LinkedList<>();
 
     public LoadBalancer() throws IOException {
@@ -20,7 +26,7 @@ public class LoadBalancer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        int ServerSocketPort = 22222;
+
         ServerSocket lbServerSocket = new ServerSocket(ServerSocketPort);
 
         //send to monitor with my port and IP

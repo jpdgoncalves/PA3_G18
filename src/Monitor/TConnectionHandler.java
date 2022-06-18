@@ -57,7 +57,9 @@ public class TConnectionHandler extends Thread{
             ServerStatus serverStatus = new ServerStatus("localhost", 5058, 1, 0);
             ssm.addServer(1, serverStatus);
             System.out.println("ServerStateMessage sends to LB : " + ssm);
+            this.oos = new ObjectOutputStream(socket.getOutputStream());
             oos.writeObject(ssm);
+            oos.close();
 
             //oos.flush();
         }
@@ -89,12 +91,17 @@ public class TConnectionHandler extends Thread{
         if(req.getCode() == 5){
             System.out.println("Heartbeat received!!");
 
-            String key = socket.getInetAddress().getHostAddress() + socket.getPort();
+            String key = req.getTarget_IP() + req.getTargetPort();
+            //System.out.println("key -" + key + "-");
 
             //try to find a server or LB
             ServerStatus stServer = Monitor.getListServers().get(key);
             LBStatus stLB = Monitor.getListLB().get(key);
 
+
+
+            //System.out.println("St server - " + stServer);
+            //System.out.println("St lb - " + stLB);
             //is a server
             if (stServer != null){
                 //reset heartbeat

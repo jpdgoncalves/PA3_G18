@@ -1,5 +1,6 @@
 package Server;
 
+import Gui.Server.ServerMainFrame;
 import Messages.Request;
 import Messages.ServerStateMessage;
 
@@ -13,11 +14,14 @@ public class TConnectionHandler extends Thread{
     //ObjectOutputStream oos;
     ObjectInputStream ois;
 
+    ServerMainFrame gui;
+
     private final String monitorIP = "localhost";
     private final int monitorPort = 5056;
 
-    public TConnectionHandler(Socket socket){
+    public TConnectionHandler(Socket socket, ServerMainFrame gui){
         this.socket = socket;
+        this.gui = gui;
     }
 
     private void startConnection() throws IOException, ClassNotFoundException {
@@ -25,6 +29,7 @@ public class TConnectionHandler extends Thread{
         //this.oos = new ObjectOutputStream(socket.getOutputStream());
 
         Request req = (Request) ois.readObject();
+        gui.addReceivedRequest(req);
         System.out.println("I got a request - " + req.getCode());
 
         //Closing connection
@@ -36,6 +41,8 @@ public class TConnectionHandler extends Thread{
             //this.oos.close();
             this.ois.close();
             System.out.println("Closed");
+            gui.addProcessedRequest(req);
+            gui.removeReceivedRequest(req.getRequestId());
             return;
         }
 
@@ -46,14 +53,16 @@ public class TConnectionHandler extends Thread{
             Server.addRequest(req);
             Socket clientSocket = new Socket(req.getTarget_IP(), req.getTargetPort());
             ObjectOutputStream oosClient = new ObjectOutputStream(clientSocket.getOutputStream());
-            //TODO: change reply with the real serverID and chnage pi for a double
+            //TODO: change reply with the real serverID and change pi for a double
             Request reply = new Request(req.getClientId(), req.getRequestId(), 2020, 02, req.getNr_iterations(), 3, req.getDeadline(), req.getTarget_IP(), req.getTargetPort());
             oosClient.writeObject(reply);
+            System.out.println("Reply sent to Client");
+
+            gui.addProcessedRequest(req);
+            gui.removeReceivedRequest(req.getRequestId());
 
             oosClient.close();
             clientSocket.close();
-
-            //oos.flush();
         }
 
          else if (req.getCode() == 4) { //receives heartbeat

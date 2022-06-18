@@ -1,5 +1,6 @@
 package Server;
 
+import Gui.Server.ServerMainFrame;
 import Messages.Request;
 
 import java.io.IOException;
@@ -50,6 +51,8 @@ public class Server {
 
         try {
 
+            ServerMainFrame gui = new ServerMainFrame();
+            gui.setVisible(true);
 
 
             ServerSocket serverSocket = new ServerSocket(ServerSocketPort);
@@ -62,7 +65,7 @@ public class Server {
 
             while(true){
                 Socket socket = serverSocket.accept();
-                TConnectionHandler thread = new TConnectionHandler(socket);
+                TConnectionHandler thread = new TConnectionHandler(socket, gui);
                 System.out.println("connection made !");
                 thread.start();
             }

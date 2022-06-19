@@ -67,7 +67,7 @@ public class Monitor {
     }
 
     public static void removeServer(String key) {
-        listServers.remove(key);
+        listServers.get(key).setStatus(0);
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {

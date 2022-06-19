@@ -32,7 +32,7 @@ public class TConnectionHandler extends Thread{
         //this.oos = new ObjectOutputStream(socket.getOutputStream());
 
         Request req = (Request) ois.readObject();
-        System.out.println("I read a request - " + req.getCode());
+        //System.out.println("I read a request - " + req.getCode());
 
         //Closing connection
         if(req.getDeadline() == -1)
@@ -70,8 +70,8 @@ public class TConnectionHandler extends Thread{
             //add LB to a list of LBs
             LBStatus lbst = new LBStatus(req.getTarget_IP(), req.getTargetPort(), 1, 0);
             Monitor.addLB(req.getTarget_IP() + req.getTargetPort(), lbst);
-            System.out.println("listLB.size() - " + Monitor.getListLB().size());
-            System.out.println(lbst);
+            //System.out.println("listLB.size() - " + Monitor.getListLB().size());
+            //System.out.println(lbst);
             //oos.flush();
         }
 
@@ -82,14 +82,14 @@ public class TConnectionHandler extends Thread{
             //add LB to a list of LBs
             ServerStatus lbst = new ServerStatus(req.getTarget_IP(), req.getTargetPort(), 1, 0);
             Monitor.addServer(req.getTarget_IP() + req.getTargetPort(), lbst);
-            System.out.println("listSRV.size() - " + Monitor.getListServers().size());
-            System.out.println(lbst);
+            //System.out.println("listSRV.size() - " + Monitor.getListServers().size());
+            //System.out.println(lbst);
             //oos.flush();
         }
 
         //Heartbeat reply - TODO test
         if(req.getCode() == 5){
-            System.out.println("Heartbeat received!!");
+            //System.out.println("Heartbeat received!!");
 
             String key = req.getTarget_IP() + req.getTargetPort();
             //System.out.println("key -" + key + "-");
@@ -109,7 +109,7 @@ public class TConnectionHandler extends Thread{
                 //set it on its place
                 Monitor.setServer(key, stServer);
 
-                System.out.println("hb as set 0? -> " + Monitor.getListLB().get(key).getHeartbeat());
+                //System.out.println("hb as set 0? -> " + Monitor.getListServers().get(key).getHeartbeat());
             }
             //else is a LB
             else if (stLB != null){
@@ -118,12 +118,12 @@ public class TConnectionHandler extends Thread{
                 //set it on its place
                 Monitor.setLB(key, stLB);
 
-                System.out.println("hb as set 0? -> " + Monitor.getListLB().get(key).getHeartbeat());
+                //System.out.println("hb as set 0? -> " + Monitor.getListLB().get(key).getHeartbeat());
             } else {
                 System.out.println("Err - not an LB or a Server!");
             }
 
-            System.out.println(req);
+            //System.out.println(req);
             //oos.flush();
         }
     }

@@ -32,26 +32,38 @@ public class THeartbeatChecker extends Thread{
         Object[] keysSrv = Monitor.getListServers().keySet().toArray();
         //System.out.println("keysSRV.length -> " + keysSrv.length);
         if (keysSrv.length != 0) {
-
             for (int i = 0; i < keysSrv.length; i++) {
 
                 ServerStatus value = Monitor.getListServers().get(keysSrv[i]);
 
                 String send_ip = value.getIp();
                 int send_port = value.getPort();
-                System.out.println("Sending to IP - " + send_ip + "  port - " + send_port);
 
-                //new heartbeat
+                //new heartbeat val TODO not sure if +1 should be done here
                 value.setHeartbeat(value.getHeartbeat() + 1);
-                //set it on its place
-                Monitor.setServer(keysSrv[i].toString(), value);
 
-                Socket socket = new Socket(send_ip, send_port);
-                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                oos.writeObject(new Request(0,0,0,4,0,0,0, "", 0));
+                if (Monitor.getListServers().get(keysSrv[i]).getHeartbeat() < maxHeartbeatsLost & Monitor.getListServers().get(keysSrv[i]).getStatus() == 1) {
+                    System.out.println("Sending to IP - " + send_ip + "  port - " + send_port + " w hb at -> " + Monitor.getListServers().get(keysSrv[i]).getHeartbeat() + " status -> " + Monitor.getListServers().get(keysSrv[i]).getStatus());
 
-                //System.out.println("?<-Heartbeat srv");
+                    //set it on its place
+                    Monitor.setServer(keysSrv[i].toString(), value);
 
+                    Socket socket = null;
+
+                    socket = new Socket(send_ip, send_port);
+
+
+                    ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                    oos.writeObject(new Request(0, 0, 0, 4, 0, 0, 0, "", 0));
+
+                    //System.out.println("?<-Heartbeat SRV");
+
+                    //System.out.println("new hb val - " + Monitor.getListServers().get(keysSrv[i]).getHeartbeat());
+                } else { //Srv died, remove
+                    Monitor.removeServer(keysSrv[i].toString());
+                    System.out.println("ERR not sending to IP - " + send_ip + "  port - " + send_port + " w hb at -> " + Monitor.getListServers().get(keysSrv[i]).getHeartbeat() + " status -> " + Monitor.getListServers().get(keysSrv[i]).getStatus());
+
+                }
 
             }
         }

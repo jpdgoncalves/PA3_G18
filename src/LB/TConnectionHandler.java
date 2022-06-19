@@ -15,16 +15,22 @@ public class TConnectionHandler extends Thread{
     ObjectOutputStream oos;
     ObjectInputStream ois;
 
-    private final String monitorIP = "localhost";
-    private final int monitorPort = 5056;
+    private final String lbIp;
+    private final int lbPort;
+    private final String monitorIP;
+    private final int monitorPort;
 
 
     /**
      * TConnectionHandler constructor
      * @param socket
      */
-    public TConnectionHandler(Socket socket){
+    public TConnectionHandler(Socket socket, String ip, int port, String mIp, int mPort){
         this.socket = socket;
+        lbIp = ip;
+        lbPort = port;
+        monitorIP = mIp;
+        monitorPort = mPort;
     }
 
     /**
@@ -106,7 +112,7 @@ public class TConnectionHandler extends Thread{
             oos.writeObject(new Request(
                     0,0,0,5,
                     0,"",0,
-                    socketToMonitor.getInetAddress().getHostAddress(), LoadBalancer.getServerSocketPort()
+                    lbIp, lbPort
             ));
 
             //close connection with monitor

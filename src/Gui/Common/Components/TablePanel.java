@@ -73,16 +73,14 @@ public class TablePanel extends TitledPanel {
         });
     }
 
-    public void setAllValuesAt(int id, Object[] data) {
-        SwingUtilities.invokeLater(() -> {
-            if (!hasRow(id) || data.length + 1 != colNameToColMap.size()) return;
+    private void setAllValuesAt(int id, Object[] data) {
+        if (!hasRow(id) || data.length + 1 != colNameToColMap.size()) return;
 
-            int rowIdx = idList.indexOf(id);
-            Object[] row = Stream.concat(Arrays.stream(new Object[] {id}), Arrays.stream(data))
-                    .toArray();
-            model.removeRow(rowIdx);
-            model.insertRow(rowIdx, row);
-        });
+        int rowIdx = idList.indexOf(id);
+        Object[] row = Stream.concat(Arrays.stream(new Object[] {id}), Arrays.stream(data))
+                .toArray();
+        model.removeRow(rowIdx);
+        model.insertRow(rowIdx, row);
     }
 }
 

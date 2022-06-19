@@ -1,5 +1,6 @@
 package Client;
 
+import Gui.Client.ClientMainFrame;
 import Messages.Request;
 import Messages.ServerStateMessage;
 import Server.Server;
@@ -10,12 +11,15 @@ import java.net.Socket;
 
 public class TServerHandler extends Thread {
 
-    Socket socket;
+    private Socket socket;
     //ObjectOutputStream oos;
-    ObjectInputStream ois;
+    private ObjectInputStream ois;
+    private ClientMainFrame gui;
 
-    public TServerHandler(Socket socket){
+    public TServerHandler(Socket socket, ClientMainFrame gui){
         this.socket = socket;
+        this.gui = gui;
+        setDaemon(true);
     }
 
     private void startConnection() throws IOException, ClassNotFoundException {
@@ -38,14 +42,14 @@ public class TServerHandler extends Thread {
         }
 
         //Server reply message
-        if(req.getCode() == 2){
+        if (req.getCode() == 2 || req.getCode() == 3){
             System.out.println("Connection with Server made - receiving server reply :");
             System.out.println(req);
-            Client.addRequest(req);
             socket.close();
             //oos.close();
             ois.close();
-
+            gui.removePendingRequest(req.getRequestId());
+            gui.addExecutedRequest(req);
             //oos.flush();
         }
 

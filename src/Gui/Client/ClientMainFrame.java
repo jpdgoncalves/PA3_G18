@@ -53,12 +53,12 @@ public class ClientMainFrame extends JFrame {
         footerPanel.setIp(ip);
     }
 
-    public void setPort(String port) {
-        footerPanel.setPort(port);
+    public void setPort(int port) {
+        footerPanel.setPort("" + port);
     }
 
-    public void setId(String id) {
-        footerPanel.setId(id);
+    public void setId(int id) {
+        footerPanel.setId("" + id);
     }
 
     public void setSendCallback(ISendCallback callback) {

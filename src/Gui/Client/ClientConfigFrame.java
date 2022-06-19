@@ -36,7 +36,9 @@ public class ClientConfigFrame extends JFrame {
         startButton.setMaximumSize(new Dimension(200, 70));
         startButton.addActionListener((e) -> {
             startButton.setEnabled(false);
-            this.callback.call(ipField.getValue(), portField.getValue(), idField.getValue());
+            int port = Integer.parseInt(portField.getValue());
+            int id = Integer.parseInt(idField.getValue());
+            this.callback.call(ipField.getValue(), port, id);
             startButton.setEnabled(true);
         });
 

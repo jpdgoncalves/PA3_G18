@@ -25,7 +25,11 @@ public class NewRequestPanel extends TitledPanel {
         BorderButtonPanel sendButton = new BorderButtonPanel("Send");
         sendButton.addActionListener((e) -> {
             sendButton.setEnabled(false);
-            this.callback.call(ipField.getValue(), portField.getValue(), niField.getValue(), deadlineField.getValue());
+            int port = Integer.parseInt(portField.getValue());
+            int ni = Integer.parseInt(niField.getValue());
+            int deadline = Integer.parseInt(deadlineField.getValue());
+
+            this.callback.call(ipField.getValue(), port, ni, deadline);
             sendButton.setEnabled(true);
         });
 

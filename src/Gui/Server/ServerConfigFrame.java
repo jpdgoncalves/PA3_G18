@@ -11,10 +11,10 @@ public class ServerConfigFrame extends JFrame {
     private final JPanel mainPanel = new JPanel();
 
     private final LabeledTextFieldPanel ipField = new LabeledTextFieldPanel("Server IP:", "localhost");
-    private final LabeledTextFieldPanel portField = new LabeledTextFieldPanel("Server Port:", "88888");
+    private final LabeledTextFieldPanel portField = new LabeledTextFieldPanel("Server Port:", "5058");
     private final LabeledTextFieldPanel idField = new LabeledTextFieldPanel("Server ID:", "99");
     private final LabeledTextFieldPanel mIpField = new LabeledTextFieldPanel("Monitor IP:", "localhost");
-    private final LabeledTextFieldPanel mPortField = new LabeledTextFieldPanel("Monitor Port:", "77777");
+    private final LabeledTextFieldPanel mPortField = new LabeledTextFieldPanel("Monitor Port:", "5056");
 
     private final BorderButtonPanel startButton = new BorderButtonPanel("Start");
 

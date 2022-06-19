@@ -6,6 +6,7 @@ public class LBStatus implements Serializable{
 
     private String ip;
     private int port;
+    private int id;
     private int status; //0 = down and 1 = up
     private int heartbeat;
 
@@ -17,9 +18,10 @@ public class LBStatus implements Serializable{
      * @param status Status of the server (0 = down and 1 = up)
      * @param heartbeat Number of heartbeats missed
      */
-    public LBStatus(String ip, int port, int status, int heartbeat){
+    public LBStatus(String ip, int port, int id, int status, int heartbeat){
         this.ip = ip;
         this.port = port;
+        this.id = id;
         this.status = status;
         this.heartbeat = heartbeat;
     }
@@ -56,6 +58,13 @@ public class LBStatus implements Serializable{
         return status;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     @Override
     public String toString() {

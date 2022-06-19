@@ -11,7 +11,7 @@ public class MonitorConfigFrame extends JFrame {
     private final JPanel mainPanel = new JPanel();
 
     private final LabeledTextFieldPanel ipField = new LabeledTextFieldPanel("Client IP: ", "localhost");
-    private final LabeledTextFieldPanel portField = new LabeledTextFieldPanel("Client Port: ", "99999");
+    private final LabeledTextFieldPanel portField = new LabeledTextFieldPanel("Client Port: ", "5056");
     private final BorderButtonPanel startButton = new BorderButtonPanel("Start");
 
     private IStartCallback callback = (ip, port) -> System.out.println(ip + " " + port);
@@ -33,7 +33,8 @@ public class MonitorConfigFrame extends JFrame {
         startButton.setMaximumSize(new Dimension(200, 70));
         startButton.addActionListener((e) -> {
             startButton.setEnabled(false);
-            this.callback.call(ipField.getValue(), portField.getValue());
+            int port = Integer.parseInt(portField.getValue());
+            this.callback.call(ipField.getValue(), port);
             startButton.setEnabled(true);
         });
 

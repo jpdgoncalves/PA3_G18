@@ -1,5 +1,6 @@
 package Monitor;
 
+import Gui.Monitor.MonitorMainFrame;
 import Messages.*;
 
 import java.io.IOException;
@@ -12,14 +13,17 @@ public class TConnectionHandler extends Thread{
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
 
+    private final MonitorMainFrame gui;
+
     private ServerStateMessage serverStateMessage;
 
     /**
      * Constructor of TConnectionHandler
      * @param socket TCP IP socket
      */
-    public TConnectionHandler(Socket socket){
+    public TConnectionHandler(Socket socket, MonitorMainFrame gui){
         this.socket = socket;
+        this.gui = gui;
     }
 
     /**
@@ -47,14 +51,15 @@ public class TConnectionHandler extends Thread{
         }
 
         //Client request connection
-        if(req.getCode() == 1){
+        if(req.getCode() == 1) {
+
             System.out.println("Connection with LB made - receiving client request :");
             System.out.println(req);
             Monitor.addRequest(req);
 
             ServerStateMessage ssm = new ServerStateMessage();
             //TODO - check these lines and the status
-            ServerStatus serverStatus = new ServerStatus("localhost", 5058, 1, 0);
+            ServerStatus serverStatus = new ServerStatus("localhost", 5058,1, 1, 0);
             ssm.addServer(1, serverStatus);
             System.out.println("ServerStateMessage sends to LB : " + ssm);
             this.oos = new ObjectOutputStream(socket.getOutputStream());
@@ -68,8 +73,12 @@ public class TConnectionHandler extends Thread{
         if(req.getCode() == 6){
             System.out.println("Connection with LB made - LB up!!");
             //add LB to a list of LBs
-            LBStatus lbst = new LBStatus(req.getTarget_IP(), req.getTargetPort(), 1, 0);
+            LBStatus lbst = new LBStatus(req.getTarget_IP(), req.getTargetPort(), req.getServerId(), 1, 0);
             Monitor.addLB(req.getTarget_IP() + req.getTargetPort(), lbst);
+            gui.addLb(req.getServerId(), req.getTarget_IP(), req.getTargetPort());
+            //TODO: We don't know here if the LB is the primary.
+            gui.setIsLbPrimary(req.getServerId(), true);
+            gui.setIsLbAlive(req.getServerId(), true);
             //System.out.println("listLB.size() - " + Monitor.getListLB().size());
             //System.out.println(lbst);
             //oos.flush();
@@ -80,8 +89,10 @@ public class TConnectionHandler extends Thread{
         if (req.getCode() == 7) {
             System.out.println("Connection with srv made - SRV up!!");
             //add LB to a list of LBs
-            ServerStatus lbst = new ServerStatus(req.getTarget_IP(), req.getTargetPort(), 1, 0);
+            ServerStatus lbst = new ServerStatus(req.getTarget_IP(), req.getTargetPort(), req.getServerId(),1, 0);
             Monitor.addServer(req.getTarget_IP() + req.getTargetPort(), lbst);
+            gui.addServer(req.getServerId(), req.getTarget_IP(), req.getTargetPort());
+            gui.setIsServerAlive(req.getServerId(), true);
             //System.out.println("listSRV.size() - " + Monitor.getListServers().size());
             //System.out.println(lbst);
             //oos.flush();

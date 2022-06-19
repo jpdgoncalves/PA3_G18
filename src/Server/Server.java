@@ -47,7 +47,7 @@ public class Server {
             Socket socketup = new Socket(mIp, mPort);
             ObjectOutputStream oos = new ObjectOutputStream(socketup.getOutputStream());
             oos.writeObject(new Request(
-                    0,0,0,7,
+                    0,0,id,7,
                     0,"",0,  ip , port
             ));
             serverSocket = new ServerSocket(port);

@@ -1,22 +1,73 @@
 package Monitor;
 
-import LB.LoadBalancer;
+import Gui.Monitor.MonitorConfigFrame;
+import Gui.Monitor.MonitorMainFrame;
 import Messages.LBStatus;
 import Messages.Request;
 import Messages.ServerStatus;
-import Server.Server;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Monitor {
     private static LinkedList <Request> listRequests = new LinkedList<>();
     private static HashMap<String, ServerStatus> listServers = new HashMap<>();
-
     private static HashMap<String, LBStatus> listLB = new HashMap<>();
+
+    private static String ip;
+    private static int port;
+
+    private static final MonitorConfigFrame configGui = new MonitorConfigFrame();
+    private static final MonitorMainFrame mainGui = new MonitorMainFrame();
+
+    private static ServerSocket serverSocket;
+    private static THeartbeatChecker hbck = new THeartbeatChecker(5);
+    private static final ReentrantLock l = new ReentrantLock();
+    private static final Condition waitSocket = l.newCondition();
+
+    private static void startMonitor(String ip, int port) {
+        Monitor.ip = ip;
+        Monitor.port = port;
+
+        try {
+            l.lock();
+            serverSocket = new ServerSocket(port);
+            hbck.start();
+            waitSocket.signal();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        } finally {
+            l.unlock();
+        }
+
+        configGui.setVisible(false);
+
+        mainGui.setIp(ip);
+        mainGui.setPort(port);
+        mainGui.setVisible(true);
+    }
+
+    private static void stopMonitor() {
+        try {
+            l.lock();
+            serverSocket.close();
+            hbck.interrupt();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        } finally {
+            l.unlock();
+        }
+
+        mainGui.setVisible(false);
+        configGui.setVisible(true);
+    }
 
     //TODO - idk if it will be maintained as a linkedlist
     public static void addRequest(Request request) {
@@ -63,23 +114,39 @@ public class Monitor {
     }
 
     public static void removeLB(String key) {
+        int id = listLB.get(key).getId();
         listLB.remove(key);
+        mainGui.setIsLbAlive(id, false);
     }
 
     public static void removeServer(String key) {
+        int id = listServers.get(key).getId();
         listServers.remove(key);
+        mainGui.setIsServerAlive(id, false);
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        ServerSocket serverSocket = new ServerSocket(5056);
+    public static void main(String[] args) {
 
-        THeartbeatChecker hbck = new THeartbeatChecker(5);
-        hbck.start();
+        configGui.setVisible(true);
+        configGui.setStartCallback(Monitor::startMonitor);
+        mainGui.setStopCallback(Monitor::stopMonitor);
 
         while(true){
-            Socket socket = serverSocket.accept();
-            TConnectionHandler thread = new TConnectionHandler(socket);
-            thread.start();
+
+            l.lock();
+            while (serverSocket == null || serverSocket.isClosed()) {
+                System.out.println("Waiting for main gui");
+                waitSocket.awaitUninterruptibly();
+            }
+            l.unlock();
+
+            try {
+                Socket socket = serverSocket.accept();
+                TConnectionHandler thread = new TConnectionHandler(socket, mainGui);
+                thread.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }

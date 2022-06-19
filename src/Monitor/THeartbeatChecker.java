@@ -18,7 +18,7 @@ public class THeartbeatChecker extends Thread{
      *
      * @param maxHeartbeatsLost maximum number of heartbeats that can be lost before the entity is removed.
      */
-    public THeartbeatChecker(int maxHeartbeatsLost) throws IOException {
+    public THeartbeatChecker(int maxHeartbeatsLost) {
         this.maxHeartbeatsLost = maxHeartbeatsLost;
     }
 
@@ -66,6 +66,7 @@ public class THeartbeatChecker extends Thread{
                     //System.out.println("new hb val - " + Monitor.getListServers().get(keysSrv[i]).getHeartbeat());
                 } else { //Srv died, remove
                     Monitor.removeServer(keysSrv[i].toString());
+
                     System.out.println("ERR not sending to IP - " + send_ip + "  port - " + send_port + " w hb at -> " + value.getHeartbeat() + " status -> " + value.getStatus());
 
                 }
@@ -121,7 +122,6 @@ public class THeartbeatChecker extends Thread{
     }
 
 
-
     /**
      * Life cycle of the thread
      */
@@ -129,14 +129,14 @@ public class THeartbeatChecker extends Thread{
     public void run() {
         System.out.println("Heartbeat start!");
 
-        while (true) {
+        while (!this.isInterrupted()) {
             try {
                 sendHeartbeats();
                 Thread.sleep(SLEEPTIME);
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            } catch (InterruptedException ignored) {
+                System.out.println("Stopping the hearbeat");
             }
         }
     }

@@ -63,7 +63,7 @@ public class Monitor {
     }
 
     public static void removeLB(String key) {
-        listLB.remove(key);
+        listLB.get(key).setStatus(0);
     }
 
     public static void removeServer(String key) {

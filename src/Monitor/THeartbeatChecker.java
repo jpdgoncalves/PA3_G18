@@ -10,7 +10,7 @@ import java.net.Socket;
 
 public class THeartbeatChecker extends Thread{
 
-    private static final int SLEEPTIME = 5000;
+    private static final int SLEEPTIME = 2000;
     private final int maxHeartbeatsLost;
 
     /**
@@ -67,26 +67,32 @@ public class THeartbeatChecker extends Thread{
 
                 String send_ip = value.getIp();
                 int send_port = value.getPort();
-                System.out.println("Sending to IP - " + send_ip + "  port - " + send_port);
 
-                //new heartbeat
+                //new heartbeat val TODO not sure if +1 should be done here
                 value.setHeartbeat(value.getHeartbeat() + 1);
-                //set it on its place
-                Monitor.setLB(keysLB[i].toString(), value);
 
-                Socket socket = null;
-                try {
+                if (Monitor.getListLB().get(keysLB[i]).getHeartbeat() < maxHeartbeatsLost & Monitor.getListLB().get(keysLB[i]).getStatus() == 1) {
+                    System.out.println("Sending to IP - " + send_ip + "  port - " + send_port + " w hb at -> " + Monitor.getListLB().get(keysLB[i]).getHeartbeat() + " status -> " + Monitor.getListLB().get(keysLB[i]).getStatus());
+
+                    //set it on its place
+                    Monitor.setLB(keysLB[i].toString(), value);
+
+                    Socket socket = null;
+
                     socket = new Socket(send_ip, send_port);
-                } catch (RuntimeException r){
+
+
+                    ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                    oos.writeObject(new Request(0, 0, 0, 4, 0, 0, 0, "", 0));
+
+                    //System.out.println("?<-Heartbeat LB");
+
+                    //System.out.println("new hb val - " + Monitor.getListLB().get(keysLB[i]).getHeartbeat());
+                } else { //LB died, remove
+                    Monitor.removeLB(keysLB[i].toString());
+                    System.out.println("ERR not sending to IP - " + send_ip + "  port - " + send_port + " w hb at -> " + Monitor.getListLB().get(keysLB[i]).getHeartbeat() + " status -> " + Monitor.getListLB().get(keysLB[i]).getStatus());
 
                 }
-
-                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                oos.writeObject(new Request(0,0,0,4,0,0,0, "", 0));
-
-                //System.out.println("?<-Heartbeat LB");
-
-                System.out.println("new hb val - " + Monitor.getListLB().get(keysLB[i]).getHeartbeat());
 
             }
         }
@@ -103,11 +109,10 @@ public class THeartbeatChecker extends Thread{
 
         while (true) {
             try {
-                System.out.println("\n\n\n");
                 sendHeartbeats();
                 Thread.sleep(SLEEPTIME);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                //throw new RuntimeException(e);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

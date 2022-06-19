@@ -108,6 +108,8 @@ public class TConnectionHandler extends Thread{
                 stServer.setHeartbeat(0);
                 //set it on its place
                 Monitor.setServer(key, stServer);
+
+                System.out.println("hb as set 0? -> " + Monitor.getListLB().get(key).getHeartbeat());
             }
             //else is a LB
             else if (stLB != null){
@@ -115,6 +117,8 @@ public class TConnectionHandler extends Thread{
                 stLB.setHeartbeat(0);
                 //set it on its place
                 Monitor.setLB(key, stLB);
+
+                System.out.println("hb as set 0? -> " + Monitor.getListLB().get(key).getHeartbeat());
             } else {
                 System.out.println("Err - not an LB or a Server!");
             }

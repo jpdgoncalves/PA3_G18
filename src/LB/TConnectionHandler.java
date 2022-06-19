@@ -103,7 +103,11 @@ public class TConnectionHandler extends Thread{
             //send to monitor with my port and IP
             Socket socketToMonitor = new Socket(monitorIP, monitorPort);
             ObjectOutputStream oos = new ObjectOutputStream(socketToMonitor.getOutputStream());
-            oos.writeObject(new Request(0,0,0,5,0,0,0,  socketToMonitor.getInetAddress().getHostAddress(), LoadBalancer.getServerSocketPort()));
+            oos.writeObject(new Request(
+                    0,0,0,5,
+                    0,"",0,
+                    socketToMonitor.getInetAddress().getHostAddress(), LoadBalancer.getServerSocketPort()
+            ));
 
             //close connection with monitor
             socketToMonitor.close();

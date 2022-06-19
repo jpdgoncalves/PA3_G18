@@ -1,5 +1,5 @@
 package Gui.Server;
 
 public interface IStartCallback {
-    void call(String ip, String port, String id, String mIp, String mPort);
+    void call(String ip, int port, int id, String mIp, int mPort);
 }

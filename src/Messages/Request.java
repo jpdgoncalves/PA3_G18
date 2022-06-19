@@ -9,12 +9,12 @@ public class Request implements Serializable {
     private int serverId;
     private int code;
     private int nr_iterations;
-    private int pi;
+    private String pi;
     private int deadline;
     private String target_IP;
     private int targetPort;
 
-    public Request(int clientId, int requestId, int serverId, int code, int nr_iterations, int pi, int deadline, String target_IP, int targetPort) {
+    public Request(int clientId, int requestId, int serverId, int code, int nr_iterations, String pi, int deadline, String target_IP, int targetPort) {
         this.clientId = clientId;
         this.requestId = requestId;
         this.serverId = serverId;
@@ -66,11 +66,11 @@ public class Request implements Serializable {
         this.nr_iterations = nr_iterations;
     }
 
-    public int getPi() {
+    public String getPi() {
         return pi;
     }
 
-    public void setPi(int pi) {
+    public void setPi(String pi) {
         this.pi = pi;
     }
 

@@ -16,12 +16,21 @@ public class TConnectionHandler extends Thread{
 
     ServerMainFrame gui;
 
-    private final String monitorIP = "localhost";
-    private final int monitorPort = 5056;
+    private final String serverIp;
+    private final int serverPort;
+    private final String monitorIP;
+    private final int monitorPort;
 
-    public TConnectionHandler(Socket socket, ServerMainFrame gui){
+    public TConnectionHandler(Socket socket, ServerMainFrame gui, String ip, int port, String mIp, int mPort){
         this.socket = socket;
         this.gui = gui;
+
+        serverIp = ip;
+        serverPort = port;
+        monitorIP = mIp;
+        monitorPort = mPort;
+
+        setDaemon(true);
     }
 
     private void startConnection() throws IOException, ClassNotFoundException {
@@ -29,7 +38,6 @@ public class TConnectionHandler extends Thread{
         //this.oos = new ObjectOutputStream(socket.getOutputStream());
 
         Request req = (Request) ois.readObject();
-        gui.addReceivedRequest(req);
         System.out.println("I got a request - " + req.getCode());
 
         //Closing connection
@@ -50,11 +58,16 @@ public class TConnectionHandler extends Thread{
         if(req.getCode() == 1){
             System.out.println("Connection with LB made - receiving client request :");
             System.out.println(req);
-            Server.addRequest(req);
+
+            gui.addReceivedRequest(req);
+            Request reply = new Request(
+                    req.getClientId(), req.getRequestId(), 2020,
+                    02, req.getNr_iterations(), getPi(req.getNr_iterations(), 5000), req.getDeadline(),
+                    req.getTarget_IP(), req.getTargetPort()
+            );
             Socket clientSocket = new Socket(req.getTarget_IP(), req.getTargetPort());
             ObjectOutputStream oosClient = new ObjectOutputStream(clientSocket.getOutputStream());
             //TODO: change reply with the real serverID and change pi for a double
-            Request reply = new Request(req.getClientId(), req.getRequestId(), 2020, 02, req.getNr_iterations(), 3, req.getDeadline(), req.getTarget_IP(), req.getTargetPort());
             oosClient.writeObject(reply);
             System.out.println("Reply sent to Client");
 
@@ -71,7 +84,10 @@ public class TConnectionHandler extends Thread{
             //send to monitor with my port and IP
             Socket socketToMonitor = new Socket(monitorIP, monitorPort);
             ObjectOutputStream oos = new ObjectOutputStream(socketToMonitor.getOutputStream());
-            oos.writeObject(new Request(0,0,0,5,0,0,0,  socketToMonitor.getInetAddress().getHostAddress(), Server.getServerSocketPort()));
+            oos.writeObject(new Request(
+                    0,0,0,5,
+                    0,"",0,  serverIp, serverPort
+            ));
 
             //close connection with monitor
             socketToMonitor.close();
@@ -104,6 +120,24 @@ public class TConnectionHandler extends Thread{
             System.out.println(req);
             //oos.flush();
         }*/
+    }
+
+    /**
+     * Creates the value of pi requested and sleeps according to the time per iteration.s
+     *
+     * @param nr_iterations number of iterations
+     * @param timePerIteration time per each iteration
+     * @return returns the value of pi according to the number of iterations
+     */
+    private String getPi(int nr_iterations, int timePerIteration){
+
+        try {
+            Thread.sleep(timePerIteration * nr_iterations);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        return "3.1415926589793".substring(0, 2 + nr_iterations);
     }
 
     private void closeConnections() throws IOException {

@@ -47,6 +47,18 @@ public class ServerMainFrame extends JFrame {
         add(mainPanel);
     }
 
+    public void setIp(String ip) {
+        footerPanel.setIp(ip);
+    }
+
+    public void setPort(int port) {
+        footerPanel.setPort("" + port);
+    }
+
+    public void setId(int id) {
+        footerPanel.setId("" + id);
+    }
+
     public void setStopCallback(IStopCallback callback) {
         footerPanel.setStopCallback(callback);
     }

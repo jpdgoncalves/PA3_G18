@@ -1,5 +1,6 @@
 package Server;
 
+import Gui.Server.ServerConfigFrame;
 import Gui.Server.ServerMainFrame;
 import Messages.Request;
 
@@ -9,6 +10,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Server class
@@ -17,9 +20,66 @@ public class Server {
 
     //Priority Blocking Queue for the requests
     public static PriorityBlockingQueue<Request> request_list;
-    private final static int ServerSocketPort = 5058;
-    public static int getServerSocketPort() {
-        return ServerSocketPort;
+
+    private static String ip;
+    private static int port;
+    private static int id;
+    private static String mIp;
+    private static int mPort;
+
+    private static ServerSocket serverSocket;
+    private static final ReentrantLock l = new ReentrantLock();
+    private static final Condition waitSocket = l.newCondition();
+
+    private final static ServerMainFrame mainGui = new ServerMainFrame();
+    private final static ServerConfigFrame configGui = new ServerConfigFrame();
+
+    public static void startServer(String ip, int port, int id, String mIp, int mPort) {
+        Server.ip = ip;
+        Server.port = port;
+        Server.id = id;
+        Server.mIp = mIp;
+        Server.mPort = mPort;
+
+        try {
+            l.lock();
+            //send to monitor with my port and IP
+            Socket socketup = new Socket(mIp, mPort);
+            ObjectOutputStream oos = new ObjectOutputStream(socketup.getOutputStream());
+            oos.writeObject(new Request(
+                    0,0,0,7,
+                    0,"",0,  ip , port
+            ));
+            serverSocket = new ServerSocket(port);
+            waitSocket.signal();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        } finally {
+            l.unlock();
+        }
+
+        configGui.setVisible(false);
+
+        mainGui.setIp(ip);
+        mainGui.setPort(port);
+        mainGui.setId(id);
+        mainGui.setVisible(true);
+    }
+
+    public static void stopServer() {
+        try {
+            l.lock();
+            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        } finally {
+            l.unlock();
+        }
+
+        mainGui.setVisible(false);
+        configGui.setVisible(true);
     }
 
     /**
@@ -49,28 +109,24 @@ public class Server {
          * 1 socket for the monitor (to receive the heartbeat and send info to the monitor)
          */
 
-        try {
+        configGui.setVisible(true);
+        configGui.setStartCallback(Server::startServer);
+        mainGui.setStopCallback(Server::stopServer);
 
-            ServerMainFrame gui = new ServerMainFrame();
-            gui.setVisible(true);
-
-
-            ServerSocket serverSocket = new ServerSocket(ServerSocketPort);
-
-            //send to monitor with my port and IP
-            Socket socketup = new Socket("127.0.0.1", 5056);
-            ObjectOutputStream oos = new ObjectOutputStream(socketup.getOutputStream());
-            oos.writeObject(new Request(0,0,0,7,0,0,0,  "127.0.0.1" , ServerSocketPort));
-
-
-            while(true){
-                Socket socket = serverSocket.accept();
-                TConnectionHandler thread = new TConnectionHandler(socket, gui);
-                System.out.println("connection made !");
-                thread.start();
+        while (true) {
+            l.lock();
+            while (serverSocket == null || serverSocket.isClosed()) {
+                System.out.println("Waiting for main gui");
+                waitSocket.awaitUninterruptibly();
             }
-        }catch (Exception e){
+            l.unlock();
 
+            try {
+                Socket socket = serverSocket.accept();
+                if (socket != null) (new TConnectionHandler(socket, mainGui, ip, port, mIp, mPort)).start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }

@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.LinkedList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -24,7 +23,7 @@ public class Client {
 
     private static ServerSocket serverSocket;
     private static final ReentrantLock l = new ReentrantLock();
-    private static Condition waitSocket = l.newCondition();
+    private static final Condition waitSocket = l.newCondition();
 
     private static final ClientConfigFrame configGui = new ClientConfigFrame();
     private static final ClientMainFrame mainGui = new ClientMainFrame();
@@ -69,7 +68,7 @@ public class Client {
     }
 
     public static void sendRequestToLB(String ip, int port, int nbOfIteration, int deadline){
-        Request request = new Request(id, requestCounter++, 1, 01, nbOfIteration, 0, deadline, Client.ip, Client.port);
+        Request request = new Request(id, requestCounter++, 1, 1, nbOfIteration, "", deadline, Client.ip, Client.port);
 
         try {
             Socket lbSocket = new Socket(ip, port);
@@ -78,13 +77,8 @@ public class Client {
             System.out.println("Request sent to LB !");
 
             mainGui.addPendingRequest(request);
-            //create connection with server
-//            Socket socket = serverSocket.accept();
-//            TServerHandler thread = new TServerHandler(socket);
-//            System.out.println("connection made with server!");
-//            thread.start();
         }catch(Exception e){
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -92,12 +86,6 @@ public class Client {
      * Tasks to be done by a client
      */
     public static void main(String[] args) {
-
-        //creates requests
-        Request request = new Request(1, 5, 1, 01, 2, 0, 2, "127.0.0.1", 5055);
-        LinkedList<Request> listRequest = new LinkedList<>();
-        listRequest.add(request);
-        listRequest.add(request);
 
         configGui.setVisible(true);
         configGui.setStartCallback(Client::startClient);

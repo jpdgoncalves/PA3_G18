@@ -43,9 +43,12 @@ public class ServerConfigFrame extends JFrame {
         startButton.setMaximumSize(new Dimension(200, 70));
         startButton.addActionListener((e) -> {
             startButton.setEnabled(false);
+            int port = Integer.parseInt(portField.getValue());
+            int id = Integer.parseInt(idField.getValue());
+            int mPort = Integer.parseInt(mPortField.getValue());
             this.callback.call(
-                    ipField.getValue(), portField.getValue(), idField.getValue(),
-                    mIpField.getValue(), mPortField.getValue()
+                    ipField.getValue(), port, id,
+                    mIpField.getValue(), mPort
             );
             startButton.setEnabled(true);
         });

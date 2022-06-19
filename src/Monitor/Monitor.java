@@ -73,7 +73,6 @@ public class Monitor {
     public static void main(String[] args) throws IOException, InterruptedException {
         ServerSocket serverSocket = new ServerSocket(5056);
 
-        //TODO - not working
         THeartbeatChecker hbck = new THeartbeatChecker(5);
         hbck.start();
 

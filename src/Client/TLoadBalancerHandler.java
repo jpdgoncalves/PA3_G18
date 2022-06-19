@@ -39,7 +39,10 @@ public class TLoadBalancerHandler extends Thread{
             }
 
             //sends the death signal
-            Request request = new Request(1, 2, 3, 4, 5, 6, -1, "127.0.0.1", 8080);
+            Request request = new Request(
+                    1, 2, 3, 4, 5,
+                    "", -1, "127.0.0.1", 8080
+            );
             out.writeObject(request);
 
             System.out.println("sent end deadline ");

@@ -54,7 +54,10 @@ public class THeartbeatChecker extends Thread{
 
 
                     ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                    oos.writeObject(new Request(0, 0, 0, 4, 0, 0, 0, "", 0));
+                    oos.writeObject(new Request(
+                            0, 0, 0, 4,
+                            0, "", 0, "", 0
+                    ));
 
                     //System.out.println("?<-Heartbeat SRV");
 
@@ -95,7 +98,10 @@ public class THeartbeatChecker extends Thread{
 
 
                     ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                    oos.writeObject(new Request(0, 0, 0, 4, 0, 0, 0, "", 0));
+                    oos.writeObject(new Request(
+                            0, 0, 0, 4, 0,
+                            "", 0, "", 0
+                    ));
 
                     //System.out.println("?<-Heartbeat LB");
 

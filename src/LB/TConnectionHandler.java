@@ -35,7 +35,7 @@ public class TConnectionHandler extends Thread{
      */
     public void startConnection() throws IOException, ClassNotFoundException {
         this.ois = new ObjectInputStream(socket.getInputStream());
-        this.oos = new ObjectOutputStream(socket.getOutputStream());
+        // this.oos = new ObjectOutputStream(socket.getOutputStream());
 
         Request req = (Request) ois.readObject();
         System.out.println("I got code - " + req.getCode());
@@ -46,7 +46,7 @@ public class TConnectionHandler extends Thread{
             System.out.println("Client " + this.socket + " sends exit...");
             System.out.println("Connection closing...");
             this.socket.close();
-            this.oos.close();
+            // this.oos.close();
             this.ois.close();
             System.out.println("Closed");
             return;
@@ -94,7 +94,7 @@ public class TConnectionHandler extends Thread{
             }
 
             LoadBalancer.addRequest(req);
-            oos.flush();
+            // oos.flush();
         }
         //TODO: check if connection is from monitor with this code
         else if (req.getCode() == 4) { //receives heartbeat
@@ -111,8 +111,8 @@ public class TConnectionHandler extends Thread{
 
             //close connection with monitor
             socketToMonitor.close();
-            oos.flush();
-            oos.close();
+            // oos.flush();
+            // oos.close();
 
         }
 

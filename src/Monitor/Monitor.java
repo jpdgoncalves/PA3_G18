@@ -63,11 +63,11 @@ public class Monitor {
     }
 
     public static void removeLB(String key) {
-        listLB.get(key).setStatus(0);
+        listLB.remove(key);
     }
 
     public static void removeServer(String key) {
-        listServers.get(key).setStatus(0);
+        listServers.remove(key);
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {

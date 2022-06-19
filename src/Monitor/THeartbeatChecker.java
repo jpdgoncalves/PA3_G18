@@ -42,7 +42,7 @@ public class THeartbeatChecker extends Thread{
                 //new heartbeat val TODO not sure if +1 should be done here
                 value.setHeartbeat(value.getHeartbeat() + 1);
 
-                if (Monitor.getListServers().get(keysSrv[i]).getHeartbeat() < maxHeartbeatsLost & Monitor.getListServers().get(keysSrv[i]).getStatus() == 1) {
+                if (Monitor.getListServers().get(keysSrv[i]).getHeartbeat() < maxHeartbeatsLost && Monitor.getListServers().get(keysSrv[i]).getStatus() == 1) {
                     System.out.println("Sending to IP - " + send_ip + "  port - " + send_port + " w hb at -> " + Monitor.getListServers().get(keysSrv[i]).getHeartbeat() + " status -> " + Monitor.getListServers().get(keysSrv[i]).getStatus());
 
                     //set it on its place
@@ -59,12 +59,14 @@ public class THeartbeatChecker extends Thread{
                             0, "", 0, "", 0
                     ));
 
+                    oos.close();
+                    socket.close();
                     //System.out.println("?<-Heartbeat SRV");
 
                     //System.out.println("new hb val - " + Monitor.getListServers().get(keysSrv[i]).getHeartbeat());
                 } else { //Srv died, remove
                     Monitor.removeServer(keysSrv[i].toString());
-                    System.out.println("ERR not sending to IP - " + send_ip + "  port - " + send_port + " w hb at -> " + Monitor.getListServers().get(keysSrv[i]).getHeartbeat() + " status -> " + Monitor.getListServers().get(keysSrv[i]).getStatus());
+                    System.out.println("ERR not sending to IP - " + send_ip + "  port - " + send_port + " w hb at -> " + value.getHeartbeat() + " status -> " + value.getStatus());
 
                 }
 
@@ -86,7 +88,7 @@ public class THeartbeatChecker extends Thread{
                 //new heartbeat val TODO not sure if +1 should be done here
                 value.setHeartbeat(value.getHeartbeat() + 1);
 
-                if (Monitor.getListLB().get(keysLB[i]).getHeartbeat() < maxHeartbeatsLost & Monitor.getListLB().get(keysLB[i]).getStatus() == 1) {
+                if (Monitor.getListLB().get(keysLB[i]).getHeartbeat() < maxHeartbeatsLost && Monitor.getListLB().get(keysLB[i]).getStatus() == 1) {
                     System.out.println("Sending to IP - " + send_ip + "  port - " + send_port + " w hb at -> " + Monitor.getListLB().get(keysLB[i]).getHeartbeat() + " status -> " + Monitor.getListLB().get(keysLB[i]).getStatus());
 
                     //set it on its place
@@ -103,12 +105,14 @@ public class THeartbeatChecker extends Thread{
                             "", 0, "", 0
                     ));
 
+                    oos.close();
+                    socket.close();
                     //System.out.println("?<-Heartbeat LB");
 
                     //System.out.println("new hb val - " + Monitor.getListLB().get(keysLB[i]).getHeartbeat());
                 } else { //LB died, remove
                     Monitor.removeLB(keysLB[i].toString());
-                    System.out.println("ERR not sending to IP - " + send_ip + "  port - " + send_port + " w hb at -> " + Monitor.getListLB().get(keysLB[i]).getHeartbeat() + " status -> " + Monitor.getListLB().get(keysLB[i]).getStatus());
+                    System.out.println("ERR not sending to IP - " + send_ip + "  port - " + send_port + " w hb at -> " + value.getHeartbeat() + " status -> " + value.getStatus());
 
                 }
 
@@ -130,7 +134,7 @@ public class THeartbeatChecker extends Thread{
                 sendHeartbeats();
                 Thread.sleep(SLEEPTIME);
             } catch (IOException e) {
-                //throw new RuntimeException(e);
+                e.printStackTrace();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

@@ -36,6 +36,6 @@ public class LabeledTextFieldPanel extends JPanel {
     }
 
     public void setEditable(boolean editable) {
-        textField.setEditable(false);
+        textField.setEditable(editable);
     }
 }

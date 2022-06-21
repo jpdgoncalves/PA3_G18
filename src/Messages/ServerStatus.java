@@ -1,7 +1,9 @@
 package Messages;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Server Status
@@ -11,11 +13,9 @@ public class ServerStatus implements Serializable {
     private int port;
     private int id;
     private int status; //0 = down and 1 = up
+
     private int heartbeat;
     private HashMap<Integer, Request> incompleteRequests = new HashMap<>(); //<requestId, Request>
-    private HashMap<Integer, Request> completeRequests = new HashMap<>(); //<requestId, Request>
-
-
 
     /**
      * Constructor of the class
@@ -73,18 +73,6 @@ public class ServerStatus implements Serializable {
         this.heartbeat = heartbeat;
     }
 
-    /**
-     * Get incomplete requests
-     * @return incomplete request
-     */
-    public HashMap<Integer, Request> getIncompleteRequests() {
-        return incompleteRequests;
-    }
-
-    /**
-     * Get Server IP
-     * @return Server IP
-     */
     public String getIp() {
         return ip;
     }
@@ -122,21 +110,23 @@ public class ServerStatus implements Serializable {
     }
 
     /**
-     * Add complete request
-     * @param requestId id of complete request to add
-     * @param request Request of complete request to add
+     * Add incomplete request
+     * @param request Request of incomplete request to add
      */
-    public void addCompleteRequest(int requestId, Request request){
-        completeRequests.put(requestId, request);
+    public void addIncompleteRequest(Request request){
+        incompleteRequests.put(request.getRequestId(), request);
+    }
+
+    public void removeIncompleteRequest(int requestId) {
+        incompleteRequests.remove(requestId);
     }
 
     /**
-     * Add incomplete request
-     * @param requestId id of incomplete request to add
-     * @param request Request of incomplete request to add
+     * Get incomplete requests
+     * @return incomplete request
      */
-    public void addIncompleteRequest(int requestId, Request request){
-        incompleteRequests.put(requestId, request);
+    public List<Request> getIncompleteRequests() {
+        return new ArrayList<>(incompleteRequests.values());
     }
 
     @Override

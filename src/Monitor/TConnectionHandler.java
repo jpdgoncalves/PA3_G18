@@ -57,16 +57,9 @@ public class TConnectionHandler extends Thread{
             System.out.println(req);
             Monitor.addRequest(req);
 
-            ServerStateMessage ssm = new ServerStateMessage();
-            //TODO - check these lines and the status
-            ServerStatus serverStatus = new ServerStatus("localhost", 5058,1, 1, 0);
-            ssm.addServer(1, serverStatus);
-            System.out.println("ServerStateMessage sends to LB : " + ssm);
             this.oos = new ObjectOutputStream(socket.getOutputStream());
-            oos.writeObject(ssm);
+            oos.writeObject(Monitor.getListServers());
             oos.close();
-
-            //oos.flush();
         }
 
         //LB up connection
@@ -79,9 +72,6 @@ public class TConnectionHandler extends Thread{
             //TODO: We don't know here if the LB is the primary.
             gui.setIsLbPrimary(req.getServerId(), true);
             gui.setIsLbAlive(req.getServerId(), true);
-            //System.out.println("listLB.size() - " + Monitor.getListLB().size());
-            //System.out.println(lbst);
-            //oos.flush();
         }
 
 
@@ -93,9 +83,6 @@ public class TConnectionHandler extends Thread{
             Monitor.addServer(req.getTarget_IP() + req.getTargetPort(), lbst);
             gui.addServer(req.getServerId(), req.getTarget_IP(), req.getTargetPort());
             gui.setIsServerAlive(req.getServerId(), true);
-            //System.out.println("listSRV.size() - " + Monitor.getListServers().size());
-            //System.out.println(lbst);
-            //oos.flush();
         }
 
         //Heartbeat reply - TODO test
@@ -109,10 +96,6 @@ public class TConnectionHandler extends Thread{
             ServerStatus stServer = Monitor.getListServers().get(key);
             LBStatus stLB = Monitor.getListLB().get(key);
 
-
-
-            //System.out.println("St server - " + stServer);
-            //System.out.println("St lb - " + stLB);
             //is a server
             if (stServer != null){
                 //reset heartbeat
@@ -134,8 +117,6 @@ public class TConnectionHandler extends Thread{
                 System.out.println("Err - not an LB or a Server!");
             }
 
-            //System.out.println(req);
-            //oos.flush();
         }
     }
 

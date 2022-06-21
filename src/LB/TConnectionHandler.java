@@ -1,7 +1,6 @@
 package LB;
 
 import Messages.Request;
-import Messages.ServerStateMessage;
 import Messages.ServerStatus;
 
 import java.io.IOException;
@@ -9,20 +8,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * Load Balancer thread handler
  */
 public class TConnectionHandler extends Thread{
-
+    private static volatile int lbRank;
+    private static volatile int lbPrimaryPort;
     private final Socket socket;
     private ObjectInputStream ois;
     private final String lbIp;
     private final int lbPort;
     private final String monitorIP;
     private final int monitorPort;
-
 
     /**
      * TConnectionHandler constructor
@@ -44,7 +42,6 @@ public class TConnectionHandler extends Thread{
      */
     public void startConnection() throws IOException, ClassNotFoundException {
         this.ois = new ObjectInputStream(socket.getInputStream());
-        // this.oos = new ObjectOutputStream(socket.getOutputStream());
 
         Request req = (Request) ois.readObject();
         System.out.println("I got code - " + req.getCode());
@@ -55,26 +52,27 @@ public class TConnectionHandler extends Thread{
             System.out.println("Client " + this.socket + " sends exit...");
             System.out.println("Connection closing...");
             this.socket.close();
-            // this.oos.close();
             this.ois.close();
             System.out.println("Closed");
             return;
         }
 
+        //open connection with Monitor
+        Socket socketToMonitor = new Socket(monitorIP, monitorPort);
+        ObjectOutputStream oosMonitor = new ObjectOutputStream(socketToMonitor.getOutputStream());
+        ObjectInputStream oisMonitor = new ObjectInputStream(socketToMonitor.getInputStream());
+
         //request from client
         if(req.getCode() == 1){
             System.out.println("Connection with Client made !!");
 
-            //open connection with monitor to ask about which server is less occupied
-            Socket socketToMonitor = new Socket(monitorIP, monitorPort);
-            ObjectOutputStream oosMonitor = new ObjectOutputStream(socketToMonitor.getOutputStream());
             System.out.println(req + " is sending to monitor");
             oosMonitor.writeObject(req);
             System.out.println("request sent to monitor");
 
             //receives response from monitor
-            ObjectInputStream oisMonitor = new ObjectInputStream(socketToMonitor.getInputStream());
             ArrayList serverState = (ArrayList) oisMonitor.readObject();
+
             //TODO: make the monitor inform about if there already is a LB running (in this case, the second one will be the secondary)
             System.out.println("I received an answer from the monitor");
             //close connection with monitor
@@ -108,9 +106,7 @@ public class TConnectionHandler extends Thread{
             System.out.println("Connection with Monitor made !!");
 
             //send to monitor with my port and IP
-            Socket socketToMonitor = new Socket(monitorIP, monitorPort);
-            ObjectOutputStream oos = new ObjectOutputStream(socketToMonitor.getOutputStream());
-            oos.writeObject(new Request(
+            oosMonitor.writeObject(new Request(
                     0,0,0,5,
                     0,"",0,
                     lbIp, lbPort
@@ -118,6 +114,15 @@ public class TConnectionHandler extends Thread{
 
             //close connection with monitor
             socketToMonitor.close();
+        }
+        //Load balancer is primary
+        else if (req.getCode() == 10) {
+            lbRank = 1;
+        }
+        //Load balancer is secondary
+        else if (req.getCode() == 11) {
+            lbRank = 2;
+            lbPrimaryPort = req.getTargetPort();
         }
     }
 

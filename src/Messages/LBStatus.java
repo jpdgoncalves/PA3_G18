@@ -1,6 +1,9 @@
 package Messages;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class LBStatus implements Serializable{
 
@@ -9,6 +12,7 @@ public class LBStatus implements Serializable{
     private int id;
     private int status; //0 = down and 1 = up
     private int heartbeat;
+    private final HashMap<Integer, Request> managedRequests = new HashMap<>();
 
     /**
      * Constructor of the class
@@ -64,6 +68,18 @@ public class LBStatus implements Serializable{
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public List<Request> getManagedRequests() {
+        return new ArrayList<>(managedRequests.values());
+    }
+
+    public void addManagedRequest(Request request) {
+        managedRequests.put(request.getRequestId(), request);
+    }
+
+    public void removeManagedRequest(int requestId) {
+        managedRequests.remove(requestId);
     }
 
     @Override

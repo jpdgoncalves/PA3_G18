@@ -20,13 +20,12 @@ public class Server {
 
     //Priority Blocking Queue for the requests
     public static PriorityBlockingQueue<Request> request_list;
-
     private static String ip;
     private static int port;
     private static int id;
     private static String mIp;
     private static int mPort;
-
+    private static int maxrequestHandlersRunning = 3;
     private static ServerSocket serverSocket;
     private static final ReentrantLock l = new ReentrantLock();
     private static final Condition waitSocket = l.newCondition();
@@ -75,6 +74,9 @@ public class Server {
         mainGui.setVisible(true);
     }
 
+    /**
+     * Shutdown the serverSocket
+     */
     public static void stopServer() {
         try {
             l.lock();
@@ -97,10 +99,26 @@ public class Server {
      */
     public static void addRequest (Request request){
 
-        if(request_list.size() < 2){
-            request_list.add(request);
-        } else {
-            //TODO - send err message
+        Boolean success = request_list.add(request);
+
+        if(!success){ //not successful, no space in the queue
+
+            //set err code
+            request.setCode(3);
+
+            //send the request to the client
+            Socket socket = null;
+            try {
+                socket = new Socket(request.getTarget_IP(), request.getTargetPort());
+                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                oos.writeObject(request);
+                oos.flush();
+                oos.close();
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("Err request sent to client");
         }
 
     }
@@ -111,9 +129,8 @@ public class Server {
      */
     public static void main(String[] args){ //chain of responsibility to not have like a 1000 diff types threads
 
-        //create the request list
+        //create the request list giving priority to lower deadlines
         request_list = new PriorityBlockingQueue<>(2, Comparator.comparingInt(Request::getDeadline));
-
 
         /** -------NOTES-------
          *
@@ -134,13 +151,22 @@ public class Server {
             }
             l.unlock();
 
+            //start TConnectionHandler
             try {
                 Socket socket = serverSocket.accept();
+
                 if (socket != null) (new TConnectionHandler(socket, mainGui, ip, port, mIp, mPort)).start();
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
 
+            //start TRequestHandlers
+            for (int i = 0; i < maxrequestHandlersRunning; i++){
+                TRequestHandler rh = new TRequestHandler(mainGui, request_list);
+                rh.start();
+            }
+        }
     }
 }

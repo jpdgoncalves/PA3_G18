@@ -42,6 +42,7 @@ public class ServerConfigFrame extends JFrame {
         // Box layout respects the maximum size and nothing else
         startButton.setMaximumSize(new Dimension(200, 70));
         startButton.addActionListener((e) -> {
+            //TODO - fix button
             startButton.setEnabled(false);
             int port = Integer.parseInt(portField.getValue());
             int id = Integer.parseInt(idField.getValue());

@@ -32,6 +32,7 @@ public class MonitorConfigFrame extends JFrame {
 
         startButton.setMaximumSize(new Dimension(200, 70));
         startButton.addActionListener((e) -> {
+            //TODO - fix button
             startButton.setEnabled(false);
             int port = Integer.parseInt(portField.getValue());
             this.callback.call(ipField.getValue(), port);

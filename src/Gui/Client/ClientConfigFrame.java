@@ -35,6 +35,8 @@ public class ClientConfigFrame extends JFrame {
         // Boxlayout respects the maximum size of the elements and nothing else
         startButton.setMaximumSize(new Dimension(200, 70));
         startButton.addActionListener((e) -> {
+
+            //TODO - fix button
             startButton.setEnabled(false);
             int port = Integer.parseInt(portField.getValue());
             int id = Integer.parseInt(idField.getValue());

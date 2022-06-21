@@ -9,6 +9,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+/**
+ * TConnectionHandler - receives requests from the LBs
+ */
 public class TConnectionHandler extends Thread{
     Socket socket;
     //ObjectOutputStream oos;
@@ -21,6 +24,15 @@ public class TConnectionHandler extends Thread{
     private final String monitorIP;
     private final int monitorPort;
 
+    /**
+     * TConnectionHandler constructor
+     * @param socket socket to receive communications
+     * @param gui Server GUI
+     * @param ip Server IP
+     * @param port Server port
+     * @param mIp Monitor IP
+     * @param mPort Monitor port
+     */
     public TConnectionHandler(Socket socket, ServerMainFrame gui, String ip, int port, String mIp, int mPort){
         this.socket = socket;
         this.gui = gui;
@@ -33,6 +45,12 @@ public class TConnectionHandler extends Thread{
         setDaemon(true);
     }
 
+    /**
+     * Handles incoming requests
+     *
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     private void startConnection() throws IOException, ClassNotFoundException {
         this.ois = new ObjectInputStream(socket.getInputStream());
         //this.oos = new ObjectOutputStream(socket.getOutputStream());
@@ -60,6 +78,9 @@ public class TConnectionHandler extends Thread{
             System.out.println(req);
 
             gui.addReceivedRequest(req);
+            Server.addRequest(req);
+
+            /*
             Request reply = new Request(
                     req.getClientId(), req.getRequestId(), 2020,
                     02, req.getNr_iterations(), getPi(req.getNr_iterations(), 5000), req.getDeadline(),
@@ -74,8 +95,10 @@ public class TConnectionHandler extends Thread{
             gui.addProcessedRequest(req);
             gui.removeReceivedRequest(req.getRequestId());
 
+
             oosClient.close();
             clientSocket.close();
+            */
         }
 
          else if (req.getCode() == 4) { //receives heartbeat
@@ -122,30 +145,20 @@ public class TConnectionHandler extends Thread{
         }*/
     }
 
+
     /**
-     * Creates the value of pi requested and sleeps according to the time per iteration.s
-     *
-     * @param nr_iterations number of iterations
-     * @param timePerIteration time per each iteration
-     * @return returns the value of pi according to the number of iterations
+     * Closes the connections
+     * @throws IOException
      */
-    private String getPi(int nr_iterations, int timePerIteration){
-
-        try {
-            Thread.sleep(timePerIteration * nr_iterations);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        return "3.1415926589793".substring(0, 2 + nr_iterations);
-    }
-
     private void closeConnections() throws IOException {
 //        serverSocket.close();
         //oos.close();
         ois.close();
     }
 
+    /**
+     * Life cycle of the thread
+     */
     @Override
     public void run() {
         try {

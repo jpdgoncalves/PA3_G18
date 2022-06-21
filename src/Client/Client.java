@@ -15,7 +15,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * Client class
  */
 public class Client {
-
     private static String ip;
     private static int port;
     private static int id;
@@ -28,6 +27,12 @@ public class Client {
     private static final ClientConfigFrame configGui = new ClientConfigFrame();
     private static final ClientMainFrame mainGui = new ClientMainFrame();
 
+    /**
+     * Starting client
+     * @param ip client IP
+     * @param port client port
+     * @param id client id
+     */
     public static void startClient(String ip, int port, int id) {
         Client.ip = ip;
         Client.port = port;
@@ -52,6 +57,9 @@ public class Client {
         mainGui.setVisible(true);
     }
 
+    /**
+     * Stop client
+     */
     public static void stopClient() {
         try {
             l.lock();
@@ -67,6 +75,13 @@ public class Client {
         configGui.setVisible(true);
     }
 
+    /**
+     * Client sends a request to Load Balancer
+     * @param ip Load Balancer IP
+     * @param port Load Balancer port
+     * @param nbOfIteration request number of iteration
+     * @param deadline request deadline
+     */
     public static void sendRequestToLB(String ip, int port, int nbOfIteration, int deadline){
         Request request = new Request(id, requestCounter++, 1, 1, nbOfIteration, "", deadline, Client.ip, Client.port);
 

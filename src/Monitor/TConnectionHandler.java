@@ -9,9 +9,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class TConnectionHandler extends Thread{
-    private Socket socket;
-    private ObjectOutputStream oos;
-    private ObjectInputStream ois;
+    private final Socket socket;
+    private ObjectOutputStream oos = null;
+    private ObjectInputStream ois = null;
 
     private final MonitorMainFrame gui;
     private final MonitorData monitorData;
@@ -28,27 +28,12 @@ public class TConnectionHandler extends Thread{
 
     /**
      * Receives a request and treats it accordingly
-     * @throws IOException
-     * @throws ClassNotFoundException
+     * @throws IOException If an IOException occurs
+     * @throws ClassNotFoundException if the object received isn't a {@link Request} object
      */
     private void startConnection() throws IOException, ClassNotFoundException {
-        this.ois = new ObjectInputStream(socket.getInputStream());
-        //this.oos = new ObjectOutputStream(socket.getOutputStream());
-
+        ois = new ObjectInputStream(socket.getInputStream());
         Request req = (Request) ois.readObject();
-        //System.out.println("I read a request - " + req.getCode());
-
-        //Closing connection
-        if(req.getDeadline() == -1)
-        {
-            System.out.println("Client " + this.socket + " sends exit...");
-            System.out.println("Connection closing...");
-            this.socket.close();
-            this.oos.close();
-            this.ois.close();
-            System.out.println("Closed");
-            return;
-        }
 
         //Client request connection
         if(req.getCode() == 1) {
@@ -59,18 +44,26 @@ public class TConnectionHandler extends Thread{
 
             this.oos = new ObjectOutputStream(socket.getOutputStream());
             oos.writeObject(monitorData.getServerList());
-            oos.close();
         }
 
         //LB up connection
         if(req.getCode() == 6){
             System.out.println("Connection with LB made - LB up!!");
             //add LB to a list of LBs
-            monitorData.addLb(new LBStatus(req.getTarget_IP(), req.getTargetPort(), req.getServerId(), 1, 0));
+            LBStatus newLb = new LBStatus(req.getTarget_IP(), req.getTargetPort(), req.getServerId(), 1, 0);
+            monitorData.addLb(newLb);
             gui.addLb(req.getServerId(), req.getTarget_IP(), req.getTargetPort());
-            //TODO: We don't know here if the LB is the primary.
-            gui.setIsLbPrimary(req.getServerId(), true);
             gui.setIsLbAlive(req.getServerId(), true);
+
+            if (monitorData.getPrimaryLb() == newLb) {
+                req.setCode(10);
+                if (!sendRequest(req.getTarget_IP(), req.getTargetPort(), req)) return;
+                gui.setIsLbPrimary(req.getServerId(), true);
+            } else {
+                req.setCode(11);
+                req.setTargetPort(monitorData.getPrimaryLb().getPort());
+                sendRequest(req.getTarget_IP(), req.getTargetPort(), req);
+            }
         }
 
 
@@ -83,21 +76,50 @@ public class TConnectionHandler extends Thread{
             gui.setIsServerAlive(req.getServerId(), true);
         }
 
-        //Heartbeat reply - TODO test
-        if(req.getCode() == 5){
-            //System.out.println("Heartbeat received!!");
+        if(req.getCode() == 5) {
+            System.out.println("Heartbeat received!!");
             monitorData.resetHeartbeat(req.getTarget_IP(), req.getTargetPort());
         }
+
+
+    }
+
+    private boolean sendRequest(String ip, int port, Request request) {
+        Socket socket = null;
+        ObjectOutputStream oos  = null;
+        boolean success = false;
+
+        try {
+            System.out.println("Sending request " + request);
+
+            socket = new Socket(ip, port);
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.writeObject(request);
+
+            System.out.println("Sent request " + request);
+            success = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            if (oos != null) oos.close();
+            if (socket != null) socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return success;
     }
 
     /**
      * Close connections
-     * @throws IOException
+     * @throws IOException If it is unable to close all used resources.
      */
     private void closeConnections() throws IOException {
-//        serverSocket.close();
-        oos.close();
-        ois.close();
+        this.socket.close();
+        if (this.ois != null) this.ois.close();
+        if (this.oos != null) this.oos.close();
     }
 
     /**
@@ -105,10 +127,17 @@ public class TConnectionHandler extends Thread{
      */
     @Override
     public void run() {
+
         try {
             startConnection();
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+        }
+
+        try {
+            closeConnections();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

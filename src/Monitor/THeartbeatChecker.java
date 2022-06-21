@@ -30,9 +30,8 @@ public class THeartbeatChecker extends Thread{
 
     /**
      * Sends heartbeats to all servers and LBs and removes the ones that are non-responsive.
-     * @throws IOException
      */
-    private void sendHeartbeats() throws IOException {
+    private void sendHeartbeats() {
 
         //check servers
         List<ServerStatus> serverStatuses = monitorData.getServerList();
@@ -41,25 +40,27 @@ public class THeartbeatChecker extends Thread{
             int hbCount = monitorData.incrementServerHeartbeat(status);
 
             if (hbCount < maxHeartbeatsLost) {
-                try {
-                    System.out.println("Sending a heartbeat to lb " + status);
-                    Socket socket = new Socket(status.getIp(), status.getPort());
-
-                    ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                    oos.writeObject(new Request(
-                            0, 0, 0, 4,
-                            0, "", 0, "", 0
-                    ));
-                    System.out.println("Sent the hearbeat lb" + status);
-
-                    oos.close();
-                    socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                sendRequest(
+                        status.getIp(), status.getPort(),
+                        new Request(
+                                0, 0, 0, 4,
+                                0, "", 0, "", 0
+                        )
+                );
             } else {
-                System.out.println("Removing lb " + status);
+                System.out.println("Removing server " + status);
                 monitorData.removeServer(status.getId());
+
+                for (LBStatus lbStatus : monitorData.getLbList()) {
+                    sendRequest(
+                            lbStatus.getIp(), lbStatus.getPort(),
+                            new Request(
+                                    0, 0, status.getId(), 8,
+                                    0, "", 0, "", 0
+                            )
+                    );
+                }
+
                 gui.removeServer(status.getId());
                 gui.setIsServerAlive(status.getId(), false);
             }
@@ -70,28 +71,56 @@ public class THeartbeatChecker extends Thread{
             int hbCount = monitorData.incrementLbHeartbeat(status);
 
             if (hbCount < maxHeartbeatsLost) {
-                try {
-                    System.out.println("Sending a heartbeat to lb " + status);
-                    Socket socket = new Socket(status.getIp(), status.getPort());
-
-
-                    ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                    oos.writeObject(new Request(
-                            0, 0, 0, 4,
-                            0, "", 0, "", 0
-                    ));
-                    System.out.println("Sent the hearbeat lb" + status);
-
-                    oos.close();
-                    socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                sendRequest(
+                        status.getIp(), status.getPort(),
+                        new Request(
+                                0, 0, 0, 4,
+                                0, "", 0, "", 0
+                        )
+                );
             } else {
                 System.out.println("Removing lb " + status);
-                monitorData.removeLb(status.getId());
                 gui.setIsLbAlive(status.getId(), false);
+                if (monitorData.getPrimaryLb() != status) return;
+
+                monitorData.removeLb(status.getId());
+                LBStatus sLbStatus = monitorData.getPrimaryLb();
+                sendRequest(
+                        sLbStatus.getIp(), sLbStatus.getPort(),
+                        new Request(
+                                0, 0, 0, 9,
+                                0, "", 0, "", 0
+                        )
+                );
+
+                gui.setIsLbPrimary(status.getId(), false);
+                gui.setIsLbPrimary(sLbStatus.getId(), true);
             }
+        }
+    }
+
+    private void sendRequest(String ip, int port, Request request) {
+        Socket socket = null;
+        ObjectOutputStream oos  = null;
+
+        try {
+            System.out.println("Sending request " + request);
+
+            socket = new Socket(ip, port);
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.writeObject(request);
+
+            System.out.println("Sent request " + request);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            if (oos != null) oos.close();
+            if (socket != null) socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -107,8 +136,6 @@ public class THeartbeatChecker extends Thread{
             try {
                 sendHeartbeats();
                 Thread.sleep(SLEEPTIME);
-            } catch (IOException e) {
-                e.printStackTrace();
             } catch (InterruptedException ignored) {
                 System.out.println("Stopping the hearbeat");
             }

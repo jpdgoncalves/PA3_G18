@@ -12,8 +12,10 @@ public class MonitorData {
     private final HashMap<Integer, ServerStatus> listServers = new HashMap<>();
     private final HashMap<Integer, LBStatus> listLB = new HashMap<>();
     private final HashMap<String, Object> heartbeats = new HashMap<>();
+    private LBStatus primaryLb = null;
 
     public synchronized void addLb(LBStatus status) {
+        if (primaryLb == null) primaryLb = status;
         listLB.put(status.getId(), status);
         heartbeats.put(serializeToKey(status.getIp(), status.getPort()), status);
     }
@@ -22,6 +24,17 @@ public class MonitorData {
         LBStatus status = listLB.remove(lbId);
         if (status == null) return;
         heartbeats.remove(serializeToKey(status.getIp(), status.getPort()));
+
+        if (status != primaryLb) return;
+        LBStatus newPrimary = getLbList().get(0);
+        heartbeats.remove(serializeToKey(newPrimary.getIp(), newPrimary.getPort()));
+        newPrimary.setPort(status.getPort());
+        primaryLb = newPrimary;
+        heartbeats.put(serializeToKey(newPrimary.getIp(), newPrimary.getPort()), newPrimary);
+    }
+
+    public synchronized LBStatus getPrimaryLb() {
+        return primaryLb;
     }
 
     public synchronized List<LBStatus> getLbList() {

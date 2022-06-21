@@ -42,14 +42,15 @@ public class THeartbeatChecker extends Thread{
 
             if (hbCount < maxHeartbeatsLost) {
                 try {
+                    System.out.println("Sending a heartbeat to lb " + status);
                     Socket socket = new Socket(status.getIp(), status.getPort());
-
 
                     ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
                     oos.writeObject(new Request(
                             0, 0, 0, 4,
                             0, "", 0, "", 0
                     ));
+                    System.out.println("Sent the hearbeat lb" + status);
 
                     oos.close();
                     socket.close();
@@ -57,6 +58,7 @@ public class THeartbeatChecker extends Thread{
                     e.printStackTrace();
                 }
             } else {
+                System.out.println("Removing lb " + status);
                 monitorData.removeServer(status.getId());
                 gui.removeServer(status.getId());
                 gui.setIsServerAlive(status.getId(), false);

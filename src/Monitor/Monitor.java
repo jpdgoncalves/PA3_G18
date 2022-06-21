@@ -15,9 +15,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Monitor {
-    private static LinkedList <Request> listRequests = new LinkedList<>();
-    private static HashMap<String, ServerStatus> listServers = new HashMap<>();
-    private static HashMap<String, LBStatus> listLB = new HashMap<>();
+    private static final MonitorData data = new MonitorData();
 
     private static String ip;
     private static int port;
@@ -26,7 +24,7 @@ public class Monitor {
     private static final MonitorMainFrame mainGui = new MonitorMainFrame();
 
     private static ServerSocket serverSocket;
-    private static THeartbeatChecker hbck = new THeartbeatChecker(5);
+    private static THeartbeatChecker hbck = new THeartbeatChecker(5, data, mainGui);
     private static final ReentrantLock l = new ReentrantLock();
     private static final Condition waitSocket = l.newCondition();
 
@@ -69,62 +67,6 @@ public class Monitor {
         configGui.setVisible(true);
     }
 
-    //TODO - idk if it will be maintained as a linkedlist
-    public static void addRequest(Request request) {
-        listRequests.add(request);
-    }
-
-    /**
-     * Adds a server to the hashmap
-     * @param IPandPort IP and port concatenated as a String
-     * @param svst Server info
-     */
-    public static void addServer(String IPandPort, ServerStatus svst) {
-        listServers.put(IPandPort, svst);
-        System.out.println("listServers.size() - " + listServers.size());
-    }
-
-    /**
-     * Adds a LB to a hashmap
-     * @param IPandPort IP and port concatenated as a String
-     * @param lbst LB info
-     */
-    public static void addLB(String IPandPort, LBStatus lbst) {
-        listLB.put(IPandPort, lbst);
-    }
-
-    public static LinkedList<Request> getListRequests() {
-        return listRequests;
-    }
-
-    public static HashMap<String, ServerStatus> getListServers() {
-        return listServers;
-    }
-
-    public static HashMap<String, LBStatus> getListLB() {
-        return listLB;
-    }
-
-    public static void setServer(String key, ServerStatus server) {
-        Monitor.listServers.put(key, server);
-    }
-
-    public static void setLB(String key, LBStatus lb) {
-        Monitor.listLB.put(key, lb);
-    }
-
-    public static void removeLB(String key) {
-        int id = listLB.get(key).getId();
-        listLB.remove(key);
-        mainGui.setIsLbAlive(id, false);
-    }
-
-    public static void removeServer(String key) {
-        int id = listServers.get(key).getId();
-        listServers.remove(key);
-        mainGui.setIsServerAlive(id, false);
-    }
-
     public static void main(String[] args) {
 
         configGui.setVisible(true);
@@ -142,7 +84,7 @@ public class Monitor {
 
             try {
                 Socket socket = serverSocket.accept();
-                TConnectionHandler thread = new TConnectionHandler(socket, mainGui);
+                TConnectionHandler thread = new TConnectionHandler(socket, data, mainGui);
                 thread.start();
             } catch (Exception e) {
                 e.printStackTrace();

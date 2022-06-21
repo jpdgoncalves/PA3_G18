@@ -15,6 +15,8 @@ public class TRequestHandler extends Thread{
     private static ServerMainFrame gui;
     private final int timePerIteration = 5000;
     public static PriorityBlockingQueue<Request> request_list;
+    private final String monitorIp;
+    private final int monitorPort;
 
     /**
      * TRequestHandler constructor
@@ -22,8 +24,9 @@ public class TRequestHandler extends Thread{
      * @param gui Server gui
      * @param request_list list of requests that are waiting to be handled
      */
-    public TRequestHandler(ServerMainFrame gui, PriorityBlockingQueue<Request> request_list){
-
+    public TRequestHandler(String mIp, int mPort, ServerMainFrame gui, PriorityBlockingQueue<Request> request_list){
+        monitorIp = mIp;
+        monitorPort = mPort;
         this.gui = gui;
         this.request_list = request_list;
         //setDaemon(true);
@@ -35,7 +38,7 @@ public class TRequestHandler extends Thread{
      * @param nr_iterations number of iterations
      * @return returns the value of pi according to the number of iterations
      */
-    private String getPi(int nr_iterations){
+    private String getPi(int nr_iterations) {
 
         try {
             Thread.sleep(timePerIteration * nr_iterations);
@@ -56,29 +59,42 @@ public class TRequestHandler extends Thread{
         req.setPi(answer);
         req.setCode(2);
 
-        Socket clientSocket = null;
-        ObjectOutputStream oosClient = null;
+        if (!sendRequest(req.getTarget_IP(), req.getTargetPort(), req)) return;
 
-        try {
-            clientSocket = new Socket(req.getTarget_IP(), req.getTargetPort());
-            oosClient = new ObjectOutputStream(clientSocket.getOutputStream());
-            oosClient.writeObject(req);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         System.out.println("Reply sent to Client");
 
         gui.addProcessedRequest(req);
         gui.removeReceivedRequest(req.getRequestId());
 
+        sendRequest(monitorIp, monitorPort, req);
+    }
+
+    private boolean sendRequest(String ip, int port, Request request) {
+        Socket socket = null;
+        ObjectOutputStream oos  = null;
+        boolean success = false;
+
         try {
-            oosClient.close();
-            clientSocket.close();
+            System.out.println("Sending request " + request);
+
+            socket = new Socket(ip, port);
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.writeObject(request);
+
+            System.out.println("Sent request " + request);
+            success = true;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
+        try {
+            if (oos != null) oos.close();
+            if (socket != null) socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return success;
     }
 
     /**

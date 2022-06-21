@@ -73,7 +73,6 @@ public class TConnectionHandler extends Thread{
             System.out.println("Connection with LB made - receiving client request :");
             System.out.println(req);
 
-            gui.addReceivedRequest(req);
             Server.addRequest(req);
 
             /*

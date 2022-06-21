@@ -25,7 +25,8 @@ public class Server {
     private static int id;
     private static String mIp;
     private static int mPort;
-    private static int maxrequestHandlersRunning = 3;
+    private final static int maxrequestHandlersRunning = 3;
+    private final static TRequestHandler[] requestHandlers = new TRequestHandler[maxrequestHandlersRunning];
     private static ServerSocket serverSocket;
     private static final ReentrantLock l = new ReentrantLock();
     private static final Condition waitSocket = l.newCondition();
@@ -66,6 +67,13 @@ public class Server {
             l.unlock();
         }
 
+        //start TRequestHandlers
+        for (int i = 0; i < maxrequestHandlersRunning; i++){
+            TRequestHandler rh = new TRequestHandler(mIp, mPort, mainGui, request_list);
+            requestHandlers[i] = rh;
+            rh.start();
+        }
+
         configGui.setVisible(false);
 
         mainGui.setIp(ip);
@@ -88,6 +96,10 @@ public class Server {
             l.unlock();
         }
 
+        for (int i = 0; i < maxrequestHandlersRunning; i++){
+            requestHandlers[i].interrupt();
+        }
+
         mainGui.setVisible(false);
         configGui.setVisible(true);
     }
@@ -99,9 +111,7 @@ public class Server {
      */
     public static void addRequest (Request request){
 
-        Boolean success = request_list.add(request);
-
-        if(!success){ //not successful, no space in the queue
+        if(request_list.size() >= 2){ //not successful, no space in the queue
 
             //set err code
             request.setCode(3);
@@ -119,6 +129,10 @@ public class Server {
                 throw new RuntimeException(e);
             }
             System.out.println("Err request sent to client");
+            mainGui.addProcessedRequest(request);
+        } else {
+            request_list.add(request);
+            mainGui.addReceivedRequest(request);
         }
 
     }
@@ -157,15 +171,8 @@ public class Server {
 
                 if (socket != null) (new TConnectionHandler(socket, mainGui, ip, port, mIp, mPort)).start();
 
-
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-
-            //start TRequestHandlers
-            for (int i = 0; i < maxrequestHandlersRunning; i++){
-                TRequestHandler rh = new TRequestHandler(mainGui, request_list);
-                rh.start();
             }
         }
     }

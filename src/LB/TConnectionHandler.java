@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Load Balancer thread handler
@@ -24,7 +25,7 @@ public class TConnectionHandler extends Thread{
     private final String monitorIP;
     private final int monitorPort;
 
-    private HashMap<Integer, ServerStatus> incompleteRequestPerServer = new HashMap<>();
+    private static final ConcurrentHashMap<Integer, ServerStatus> incompleteRequestPerServer = new ConcurrentHashMap<>();
 
     /**
      * TConnectionHandler constructor
@@ -65,24 +66,27 @@ public class TConnectionHandler extends Thread{
         if(req.getCode() == 1){
             System.out.println("Connection with Client made !!");
 
-            //open connection with Monitor
-            System.out.println(req + " is sending to monitor");
-            sendRequest(monitorIP, monitorPort, req);
-            System.out.println("request sent to monitor");
-
             //this is the server with less occupation
             ServerStatus serverId = getServerWithLessOccupationForRequests();
             System.out.println("Message to monitor sent\n Now openning connection with server");
             System.out.println("SERVER ID ->" + serverId);
             if (serverId != null) {
                 //open connection with less occupied server
-                System.out.println("server to forward to is : " + serverId);
-                sendRequest(serverId.getIp(), serverId.getPort(), req);
-                System.out.println("I finished forwarding my request to Server !");
+                if (lbRank == 1) {
+                    req.setServerId(serverId.getId());
+                    System.out.println("server to forward to is : " + serverId);
+                    sendRequest(serverId.getIp(), serverId.getPort(), req);
+                    System.out.println("I finished forwarding my request to Server !");
 
-                serverId.addIncompleteRequest(req);
+                    serverId.addIncompleteRequest(req);
 
-                System.out.println("server connection finished");
+                    //open connection with Monitor
+                    System.out.println(req + " is sending to monitor");
+                    sendRequest(monitorIP, monitorPort, req);
+                    System.out.println("request sent to monitor");
+
+                    System.out.println("server connection finished");
+                }
             }else{
                 System.out.println("No servers available.");
             }
@@ -108,6 +112,7 @@ public class TConnectionHandler extends Thread{
         //when a server is up
         else if (req.getCode() == 7) {
             incompleteRequestPerServer.put(req.getServerId(), new ServerStatus(req.getTarget_IP(), req.getTargetPort(), req.getServerId(), 0, 0));
+            System.out.println(incompleteRequestPerServer);
         }
         //when a server goes down
         else if (req.getCode() == 8) {
@@ -115,7 +120,13 @@ public class TConnectionHandler extends Thread{
             List<Request> requestIncompleteFromServerDown = status.getIncompleteRequests();
             for (Request request : requestIncompleteFromServerDown){
                 ServerStatus serverStatusToSend = getServerWithLessOccupationForRequests();
-                sendRequest(serverStatusToSend.getIp(), serverStatusToSend.getPort(), request);
+                request.setServerId(serverStatusToSend.getId());
+                serverStatusToSend.addIncompleteRequest(request);
+
+                if (lbRank == 1) {
+                    sendRequest(serverStatusToSend.getIp(), serverStatusToSend.getPort(), request);
+                    sendRequest(monitorIP, monitorPort, request);
+                }
             }
         }
 
@@ -167,6 +178,7 @@ public class TConnectionHandler extends Thread{
         for (int serverId : incompleteRequestPerServer.keySet()) {
             List<Request> requests = incompleteRequestPerServer.get(serverId).getIncompleteRequests();
             int newWorkload = requests.stream().mapToInt(Request::getNr_iterations).reduce(0, Integer::sum);
+            System.out.println(newWorkload);
             if (newWorkload < workload){
                 selectedServer = serverId;
                 workload = newWorkload;

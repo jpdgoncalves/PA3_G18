@@ -8,6 +8,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Load Balancer thread handler
@@ -21,6 +23,8 @@ public class TConnectionHandler extends Thread{
     private final int lbPort;
     private final String monitorIP;
     private final int monitorPort;
+
+    private HashMap<Integer, ServerStatus> incompleteRequestPerServer = new HashMap<>();
 
     /**
      * TConnectionHandler constructor
@@ -62,26 +66,12 @@ public class TConnectionHandler extends Thread{
             System.out.println("Connection with Client made !!");
 
             //open connection with Monitor
-            Socket socketToMonitor = new Socket(monitorIP, monitorPort);
-            ObjectOutputStream oosMonitor = new ObjectOutputStream(socketToMonitor.getOutputStream());
-            ObjectInputStream oisMonitor = new ObjectInputStream(socketToMonitor.getInputStream());
-
             System.out.println(req + " is sending to monitor");
-            oosMonitor.writeObject(req);
+            sendRequest(monitorIP, monitorPort, req);
             System.out.println("request sent to monitor");
 
-            //receives response from monitor
-            ArrayList serverState = (ArrayList) oisMonitor.readObject();
-
-            //TODO: make the monitor inform about if there already is a LB running (in this case, the second one will be the secondary)
-            System.out.println("I received an answer from the monitor");
-            //close connection with monitor
-            socketToMonitor.close();
-            oosMonitor.close();
-            oisMonitor.close();
-
             //this is the server with less occupation
-            ServerStatus serverId = getServerWithLessOccupation(serverState);
+            ServerStatus serverId = getServerWithLessOccupationForRequests();
             System.out.println("Message to monitor sent\n Now openning connection with server");
             System.out.println("SERVER ID ->" + serverId);
             if (serverId != null) {
@@ -89,12 +79,20 @@ public class TConnectionHandler extends Thread{
                 System.out.println("server to forward to is : " + serverId);
                 sendRequest(serverId.getIp(), serverId.getPort(), req);
                 System.out.println("I finished forwarding my request to Server !");
+
+                serverId.addIncompleteRequest(req);
+
                 System.out.println("server connection finished");
             }else{
                 System.out.println("No servers available.");
             }
 
             LoadBalancer.addRequest(req);
+        }
+        //if Monitor sends this code, it means the server has replied to client
+        else if(req.getCode() == 2 || req.getCode() == 3){
+            //remove request that has been completed
+            incompleteRequestPerServer.get(req.getServerId()).removeIncompleteRequest(req.getRequestId());
         }
         //receives Monitor heartbeat
         else if (req.getCode() == 4) {
@@ -106,7 +104,22 @@ public class TConnectionHandler extends Thread{
                     0,"",0,
                     lbIp, lbPort
             ));
-        } else if (req.getCode() == 9) {
+        }
+        //when a server is up
+        else if (req.getCode() == 7) {
+            incompleteRequestPerServer.put(req.getServerId(), new ServerStatus(req.getTarget_IP(), req.getTargetPort(), req.getServerId(), 0, 0));
+        }
+        //when a server goes down
+        else if (req.getCode() == 8) {
+            ServerStatus status = incompleteRequestPerServer.remove(req.getServerId());
+            List<Request> requestIncompleteFromServerDown = status.getIncompleteRequests();
+            for (Request request : requestIncompleteFromServerDown){
+                ServerStatus serverStatusToSend = getServerWithLessOccupationForRequests();
+                sendRequest(serverStatusToSend.getIp(), serverStatusToSend.getPort(), request);
+            }
+        }
+
+        else if (req.getCode() == 9) {
             if(lbRank == 2){
                 LoadBalancer.swapServerSocket(lbPrimaryPort);
                 lbRank = 1;
@@ -146,6 +159,20 @@ public class TConnectionHandler extends Thread{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private ServerStatus getServerWithLessOccupationForRequests(){
+        int workload = 1000;
+        int selectedServer = -1;
+        for (int serverId : incompleteRequestPerServer.keySet()) {
+            List<Request> requests = incompleteRequestPerServer.get(serverId).getIncompleteRequests();
+            int newWorkload = requests.stream().mapToInt(Request::getNr_iterations).reduce(0, Integer::sum);
+            if (newWorkload < workload){
+                selectedServer = serverId;
+                workload = newWorkload;
+            }
+        }
+        return incompleteRequestPerServer.get(selectedServer);
     }
 
     private ServerStatus getServerWithLessOccupation(ArrayList<ServerStatus> listServers){

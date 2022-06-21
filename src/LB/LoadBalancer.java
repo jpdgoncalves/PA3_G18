@@ -14,11 +14,23 @@ import java.util.concurrent.locks.ReentrantLock;
  * Load Balancer class
  */
 public class LoadBalancer {
+
+    //load balancer ip
     private static String ip;
+
+    //load balancer port
     private static int port;
+
+    //load balancer id
     private static int id;
+
+    //monitor ip
     private static String mIp;
+
+    //monitor port
     private static int mPort;
+
+    //Load balancer's main GUI
     private static final LBMainFrame gui = new LBMainFrame();
     private static ServerSocket lbServerSocket;
     private static final ReentrantLock l = new ReentrantLock();
@@ -82,6 +94,10 @@ public class LoadBalancer {
         gui.setStartEnabled(true);
     }
 
+    /**
+     * When a secondary load balancer becomes the primary, switch the port of the serversocket.
+     * @param port new port
+     */
     public static void swapServerSocket(int port){
         l.lock();
         try{
@@ -99,7 +115,7 @@ public class LoadBalancer {
 
     /**
      * Adding request to list of requests
-     * @param request
+     * @param request request to be added
      */
     public static void addRequest(Request request) {
         listRequests.add(request);

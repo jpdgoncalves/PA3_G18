@@ -15,15 +15,28 @@ import java.util.concurrent.ConcurrentHashMap;
  * Load Balancer thread handler
  */
 public class TConnectionHandler extends Thread{
+
+    //rank of the LB, determines if is the primary
     private static volatile int lbRank;
+
+    //Port of the primary load balancer
     private static volatile int lbPrimaryPort;
     private final Socket socket;
     private ObjectInputStream ois;
+
+    //ip of the load balancer
     private final String lbIp;
+
+    //port of the load balancer
     private final int lbPort;
+
+    //ip of the monitor
     private final String monitorIP;
+
+    //port of the monitor
     private final int monitorPort;
 
+    //Concurrent hashmap with the incomplete request for each server
     private static final ConcurrentHashMap<Integer, ServerStatus> incompleteRequestPerServer = new ConcurrentHashMap<>();
 
     /**
@@ -146,6 +159,12 @@ public class TConnectionHandler extends Thread{
         }
     }
 
+    /**
+     * Send a request given a IP address, a port and a request
+     * @param ip target IP
+     * @param port target port
+     * @param request request to send
+     */
     private void sendRequest(String ip, int port, Request request) {
         Socket socket = null;
         ObjectOutputStream oos  = null;
@@ -171,6 +190,10 @@ public class TConnectionHandler extends Thread{
         }
     }
 
+    /**
+     * Gets the server with less occupation
+     * @return serverstatus with least occupation
+     */
     private ServerStatus getServerWithLessOccupationForRequests(){
         int workload = 1000;
         int selectedServer = -1;
@@ -186,6 +209,11 @@ public class TConnectionHandler extends Thread{
         return incompleteRequestPerServer.get(selectedServer);
     }
 
+    /**
+     * Gets server with least occupation
+     * @param listServers list of servers
+     * @return serverstatus with least occupation
+     */
     private ServerStatus getServerWithLessOccupation(ArrayList<ServerStatus> listServers){
         ServerStatus serverIdWithLessOccupation = null;
         int numberRequestServer = 25; //higher than the maximum possible for a server

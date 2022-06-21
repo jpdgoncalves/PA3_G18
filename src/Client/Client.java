@@ -15,16 +15,26 @@ import java.util.concurrent.locks.ReentrantLock;
  * Client class
  */
 public class Client {
+
+    //client ip
     private static String ip;
+
+    //client port
     private static int port;
+
+    //client id
     private static int id;
+
+    //number of requests sent
     private static int requestCounter = 0;
 
     private static ServerSocket serverSocket;
     private static final ReentrantLock l = new ReentrantLock();
     private static final Condition waitSocket = l.newCondition();
 
+    //configuration GUI
     private static final ClientConfigFrame configGui = new ClientConfigFrame();
+    //Main GUI
     private static final ClientMainFrame mainGui = new ClientMainFrame();
 
     /**

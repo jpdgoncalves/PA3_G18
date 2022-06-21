@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class NewRequestPanel extends TitledPanel {
     private final LabeledTextFieldPanel ipField = new LabeledTextFieldPanel("IP: ", "localhost");
-    private final LabeledTextFieldPanel portField = new LabeledTextFieldPanel("Port: ", "99999");
+    private final LabeledTextFieldPanel portField = new LabeledTextFieldPanel("Port: ", "22222");
     private final LabeledTextFieldPanel niField = new LabeledTextFieldPanel(
             "Number of Iterations: ", "2"
     );

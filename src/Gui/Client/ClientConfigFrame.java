@@ -10,7 +10,7 @@ import java.awt.*;
 public class ClientConfigFrame extends JFrame {
     private final JPanel mainPanel = new JPanel();
     private final LabeledTextFieldPanel ipField = new LabeledTextFieldPanel("Client IP: ", "localhost");
-    private final LabeledTextFieldPanel portField = new LabeledTextFieldPanel("Client Port: ", "99999");
+    private final LabeledTextFieldPanel portField = new LabeledTextFieldPanel("Client Port: ", "10000");
     private final LabeledTextFieldPanel idField = new LabeledTextFieldPanel("Client ID: ", "99");
     private IStartCallback callback = (ip, port, id) -> System.out.println(ip + " " + port + " " + id);
 
@@ -20,7 +20,7 @@ public class ClientConfigFrame extends JFrame {
 
     public ClientConfigFrame(int width, int height) {
         super();
-        setTitle("Gui.Client Configuration");
+        setTitle("Client Configuration");
         setSize(width, height);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 

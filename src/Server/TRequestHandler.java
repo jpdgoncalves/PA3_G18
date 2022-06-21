@@ -54,6 +54,7 @@ public class TRequestHandler extends Thread{
 
         String answer = getPi(req.getNr_iterations());
         req.setPi(answer);
+        req.setCode(2);
 
         Socket clientSocket = null;
         ObjectOutputStream oosClient = null;

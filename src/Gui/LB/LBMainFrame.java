@@ -29,7 +29,7 @@ public class LBMainFrame extends JFrame {
 
     public LBMainFrame(int width, int height) {
         super();
-        setTitle("Load Balancer Configuration");
+        setTitle("Load Balancer");
         setSize(width, height);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 

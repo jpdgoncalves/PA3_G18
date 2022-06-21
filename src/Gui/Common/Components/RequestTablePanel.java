@@ -21,7 +21,7 @@ public class RequestTablePanel extends TablePanel {
     private Object[] requestToObjectArray(Request request) {
         return new Object[] {
                 request.getClientId(), request.getServerId(),
-                request.getCode(), request.getNr_iterations(),
+                request.getNr_iterations(), request.getCode(),
                 request.getPi(), request.getDeadline(),
                 request.getTarget_IP(), request.getTargetPort()
         };

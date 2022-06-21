@@ -83,13 +83,14 @@ public class Client {
      * @param deadline request deadline
      */
     public static void sendRequestToLB(String ip, int port, int nbOfIteration, int deadline){
-        Request request = new Request(id, requestCounter++, 1, 1, nbOfIteration, "", deadline, Client.ip, Client.port);
+        Request request = new Request(id, id * 1000 + requestCounter++, 0, 1, nbOfIteration, "", deadline, Client.ip, Client.port);
 
         try {
             Socket lbSocket = new Socket(ip, port);
             ObjectOutputStream oos = new ObjectOutputStream(lbSocket.getOutputStream());
             oos.writeObject(request);
             System.out.println("Request sent to LB !");
+            System.out.println(request);
 
             mainGui.addPendingRequest(request);
         }catch(Exception e){

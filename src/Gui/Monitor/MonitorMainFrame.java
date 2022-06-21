@@ -66,6 +66,10 @@ public class MonitorMainFrame extends JFrame {
         upDownTab.setIsLbAlive(id, isAlive);
     }
 
+    public void setLbPort(int id, int port) {
+        upDownTab.setLbPort(id, port);
+    }
+
     public void setIsServerAlive(int id, boolean isAlive) {
         upDownTab.setIsServerAlive(id, isAlive);
     }

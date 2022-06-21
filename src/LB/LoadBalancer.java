@@ -87,6 +87,8 @@ public class LoadBalancer {
         try{
             lbServerSocket.close();
             lbServerSocket = new ServerSocket(port);
+            LoadBalancer.port = port;
+            gui.setLbPort(port);
             waitSocket.signal();
         }catch (Exception e){
             e.printStackTrace();

@@ -20,17 +20,20 @@ public class MonitorData {
         heartbeats.put(serializeToKey(status.getIp(), status.getPort()), status);
     }
 
-    public synchronized void removeLb(int lbId) {
+    public synchronized int removeLb(int lbId) {
         LBStatus status = listLB.remove(lbId);
-        if (status == null) return;
+        if (status == null) return 0;
         heartbeats.remove(serializeToKey(status.getIp(), status.getPort()));
 
-        if (status != primaryLb) return;
+        if (status != primaryLb) return 0;
         LBStatus newPrimary = getLbList().get(0);
+        int oldPort = newPrimary.getPort();
         heartbeats.remove(serializeToKey(newPrimary.getIp(), newPrimary.getPort()));
         newPrimary.setPort(status.getPort());
         primaryLb = newPrimary;
         heartbeats.put(serializeToKey(newPrimary.getIp(), newPrimary.getPort()), newPrimary);
+
+        return oldPort;
     }
 
     public synchronized LBStatus getPrimaryLb() {

@@ -89,4 +89,10 @@ public class LBMainFrame extends JFrame {
     public void setStopEnabled(boolean enabled) {
         footerPanel.setStopEnabled(enabled);
     }
+
+    public void setLbPort(int port) {
+        SwingUtilities.invokeLater(() -> {
+            portField.setValue("" + port);
+        });
+    }
 }

@@ -46,6 +46,10 @@ class UpDownTab extends JPanel {
         lbsTable.setValueAt(id, "Status", isAlive ? "ALIVE" : "DEAD");
     }
 
+    public void setLbPort(int id, int port) {
+        lbsTable.setValueAt(id, "Port", port);
+    }
+
     public void setIsServerAlive(int id, boolean isAlive) {
         serversTable.setValueAt(id, "Status", isAlive ? "ALIVE" : "DEAD");
     }

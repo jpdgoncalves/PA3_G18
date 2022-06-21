@@ -83,16 +83,17 @@ public class THeartbeatChecker extends Thread{
                 gui.setIsLbAlive(status.getId(), false);
                 if (monitorData.getPrimaryLb() != status) return;
 
-                monitorData.removeLb(status.getId());
+                int oldPort = monitorData.removeLb(status.getId());
                 LBStatus sLbStatus = monitorData.getPrimaryLb();
                 sendRequest(
-                        sLbStatus.getIp(), sLbStatus.getPort(),
+                        sLbStatus.getIp(), oldPort,
                         new Request(
                                 0, 0, 0, 9,
                                 0, "", 0, "", 0
                         )
                 );
 
+                gui.setLbPort(sLbStatus.getId(), sLbStatus.getPort());
                 gui.setIsLbPrimary(status.getId(), false);
                 gui.setIsLbPrimary(sLbStatus.getId(), true);
             }

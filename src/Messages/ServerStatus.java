@@ -73,6 +73,10 @@ public class ServerStatus implements Serializable {
         this.heartbeat = heartbeat;
     }
 
+    /**
+     * Get Server IP
+     * @return Server IP
+     */
     public String getIp() {
         return ip;
     }

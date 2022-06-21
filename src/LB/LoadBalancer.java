@@ -82,6 +82,19 @@ public class LoadBalancer {
         gui.setStartEnabled(true);
     }
 
+    public static void swapServerSocket(int port){
+        l.lock();
+        try{
+            lbServerSocket.close();
+            lbServerSocket = new ServerSocket(port);
+            waitSocket.signal();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        l.unlock();
+    }
+
     /**
      * Adding request to list of requests
      * @param request

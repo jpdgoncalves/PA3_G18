@@ -57,14 +57,14 @@ public class TConnectionHandler extends Thread{
             return;
         }
 
-        //open connection with Monitor
-        Socket socketToMonitor = new Socket(monitorIP, monitorPort);
-        ObjectOutputStream oosMonitor = new ObjectOutputStream(socketToMonitor.getOutputStream());
-        ObjectInputStream oisMonitor = new ObjectInputStream(socketToMonitor.getInputStream());
-
         //request from client
         if(req.getCode() == 1){
             System.out.println("Connection with Client made !!");
+
+            //open connection with Monitor
+            Socket socketToMonitor = new Socket(monitorIP, monitorPort);
+            ObjectOutputStream oosMonitor = new ObjectOutputStream(socketToMonitor.getOutputStream());
+            ObjectInputStream oisMonitor = new ObjectInputStream(socketToMonitor.getInputStream());
 
             System.out.println(req + " is sending to monitor");
             oosMonitor.writeObject(req);
@@ -86,14 +86,9 @@ public class TConnectionHandler extends Thread{
             System.out.println("SERVER ID ->" + serverId);
             if (serverId != null) {
                 //open connection with less occupied server
-                Socket serverSocket = new Socket(serverId.getIp(), serverId.getPort());
-                ObjectOutputStream oosServer = new ObjectOutputStream(serverSocket.getOutputStream());
                 System.out.println("server to forward to is : " + serverId);
-                oosServer.writeObject(req);
+                sendRequest(serverId.getIp(), serverId.getPort(), req);
                 System.out.println("I finished forwarding my request to Server !");
-                //close connection with server
-                serverSocket.close();
-                oosServer.close();
                 System.out.println("server connection finished");
             }else{
                 System.out.println("No servers available.");
@@ -105,16 +100,17 @@ public class TConnectionHandler extends Thread{
         else if (req.getCode() == 4) {
             System.out.println("Connection with Monitor made !!");
 
-            //send to monitor with my port and IP
-            oosMonitor.writeObject(new Request(
+            //open connection with Monitor
+            sendRequest(monitorIP, monitorPort, new Request(
                     0,0,0,5,
                     0,"",0,
                     lbIp, lbPort
             ));
-
-
-            //close connection with monitor
-            socketToMonitor.close();
+        } else if (req.getCode() == 9) {
+            if(lbRank == 2){
+                LoadBalancer.swapServerSocket(lbPrimaryPort);
+                lbRank = 1;
+            }
         }
         //Load balancer is primary
         else if (req.getCode() == 10) {
@@ -124,6 +120,31 @@ public class TConnectionHandler extends Thread{
         else if (req.getCode() == 11) {
             lbRank = 2;
             lbPrimaryPort = req.getTargetPort();
+        }
+    }
+
+    private void sendRequest(String ip, int port, Request request) {
+        Socket socket = null;
+        ObjectOutputStream oos  = null;
+
+        try {
+            System.out.println("Sending request " + request);
+
+            socket = new Socket(ip, port);
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.writeObject(request);
+
+            System.out.println("Sent request " + request);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            if (oos != null) oos.close();
+            if (socket != null) socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

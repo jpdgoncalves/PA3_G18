@@ -63,7 +63,9 @@ public class TConnectionHandler extends Thread{
                 req.setCode(11);
                 int port = req.getTargetPort();
                 req.setTargetPort(monitorData.getPrimaryLb().getPort());
+                System.out.println(" Port is ::::" + port);
                 sendRequest(req.getTarget_IP(), port, req);
+
             }
         }
 

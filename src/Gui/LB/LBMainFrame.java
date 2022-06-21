@@ -6,6 +6,9 @@ import Gui.Common.IStopCallback;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+/**
+ * Load balancer main Frame
+ */
 public class LBMainFrame extends JFrame {
     private final JPanel mainPanel = new JPanel();
 
@@ -23,10 +26,18 @@ public class LBMainFrame extends JFrame {
 
     private IStopCallback stopCallback = () -> System.out.println("LB Stop");
 
+    /**
+     * Constructor
+     */
     public LBMainFrame() {
         this(500, 500);
     }
 
+    /**
+     * Constructor
+     * @param width with of frmae
+     * @param height height of frame
+     */
     public LBMainFrame(int width, int height) {
         super();
         setTitle("Load Balancer");
@@ -66,6 +77,10 @@ public class LBMainFrame extends JFrame {
         add(mainPanel);
     }
 
+    /**
+     * Set edition of frame
+     * @param value if we can edit or not
+     */
     public void setCanEdit(boolean value) {
         ipField.setEditable(value);
         portField.setEditable(value);
@@ -74,22 +89,42 @@ public class LBMainFrame extends JFrame {
         mPortField.setEditable(value);
     }
 
+    /**
+     * Set the start call back
+     * @param callback the call back when start
+     */
     public void setStartCallback(IStartCallback callback) {
         startCallback = callback;
     }
 
+    /**
+     * Set the stop call back
+     * @param callback the call back when stop
+     */
     public void setStopCallback(IStopCallback callback) {
         stopCallback = callback;
     }
 
+    /**
+     * Set the start button enabled
+     * @param enabled tells if the start is enabled
+     */
     public void setStartEnabled(boolean enabled) {
         footerPanel.setStartEnabled(enabled);
     }
 
+    /**
+     * Set the stop button enabled
+     * @param enabled tells if the stop is enabled
+     */
     public void setStopEnabled(boolean enabled) {
         footerPanel.setStopEnabled(enabled);
     }
 
+    /**
+     * Set Load Balancer port
+     * @param port port of Load Balancer
+     */
     public void setLbPort(int port) {
         SwingUtilities.invokeLater(() -> {
             portField.setValue("" + port);

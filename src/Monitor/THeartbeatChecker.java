@@ -10,6 +10,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
 
+/**
+ * The heartbeat checker of Monitor
+ */
 public class THeartbeatChecker extends Thread{
 
     private static final int SLEEPTIME = 2000;
@@ -100,6 +103,12 @@ public class THeartbeatChecker extends Thread{
         }
     }
 
+    /**
+     * Send request to an entity
+     * @param ip ip of entity
+     * @param port port of entity
+     * @param request request to send
+     */
     private void sendRequest(String ip, int port, Request request) {
         Socket socket = null;
         ObjectOutputStream oos  = null;

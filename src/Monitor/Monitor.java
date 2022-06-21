@@ -23,6 +23,11 @@ public class Monitor {
     private static final ReentrantLock l = new ReentrantLock();
     private static final Condition waitSocket = l.newCondition();
 
+    /**
+     * Start monitor
+     * @param ip
+     * @param port
+     */
     private static void startMonitor(String ip, int port) {
         Monitor.ip = ip;
         Monitor.port = port;
@@ -46,6 +51,9 @@ public class Monitor {
         mainGui.setVisible(true);
     }
 
+    /**
+     * Stop monitor
+     */
     private static void stopMonitor() {
         try {
             l.lock();
@@ -62,6 +70,10 @@ public class Monitor {
         configGui.setVisible(true);
     }
 
+    /**
+     * Monitor main routine
+     * @param args
+     */
     public static void main(String[] args) {
 
         configGui.setVisible(true);
@@ -85,9 +97,5 @@ public class Monitor {
                 e.printStackTrace();
             }
         }
-
     }
-
-
-
 }

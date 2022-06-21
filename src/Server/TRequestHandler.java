@@ -14,6 +14,9 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class TRequestHandler extends Thread{
     private static ServerMainFrame gui;
     private final int timePerIteration = 5000;
+    /**
+     * Priority Blocaking Queue for requests
+     */
     public static PriorityBlockingQueue<Request> request_list;
     private final String monitorIp;
     private final int monitorPort;
@@ -29,7 +32,6 @@ public class TRequestHandler extends Thread{
         monitorPort = mPort;
         this.gui = gui;
         this.request_list = request_list;
-        //setDaemon(true);
     }
 
     /**
@@ -39,7 +41,6 @@ public class TRequestHandler extends Thread{
      * @return returns the value of pi according to the number of iterations
      */
     private String getPi(int nr_iterations) {
-
         try {
             Thread.sleep(timePerIteration * nr_iterations);
         } catch (InterruptedException e) {
@@ -114,7 +115,6 @@ public class TRequestHandler extends Thread{
 
             //handle the request
             handleRequest(req);
-
         }
     }
 }

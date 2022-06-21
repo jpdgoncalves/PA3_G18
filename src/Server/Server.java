@@ -18,13 +18,31 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Server {
 
-    //Priority Blocking Queue for the requests
+    /**
+     * Priority Blocking Queue for the requests
+     */
     public static PriorityBlockingQueue<Request> request_list;
+    /**
+     * Server IP
+     */
     private static String ip;
+    /**
+     * Server port
+     */
     private static int port;
+    /**
+     * Server id
+     */
     private static int id;
+    /**
+     * monitor ip
+     */
     private static String mIp;
+    /**
+     * monitor port
+     */
     private static int mPort;
+
     private final static int maxrequestHandlersRunning = 3;
     private final static TRequestHandler[] requestHandlers = new TRequestHandler[maxrequestHandlersRunning];
     private static ServerSocket serverSocket;

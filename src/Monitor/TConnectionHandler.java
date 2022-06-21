@@ -8,6 +8,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+/**
+ * Connection Handler thread of Monitor
+ */
 public class TConnectionHandler extends Thread{
     private final Socket socket;
     private ObjectOutputStream oos = null;
@@ -108,6 +111,13 @@ public class TConnectionHandler extends Thread{
 
     }
 
+    /**
+     * Send request
+     * @param ip ip to entity to which send
+     * @param port port of entity to which send
+     * @param request request to send
+     * @return if request has been sent
+      */
     private boolean sendRequest(String ip, int port, Request request) {
         Socket socket = null;
         ObjectOutputStream oos  = null;

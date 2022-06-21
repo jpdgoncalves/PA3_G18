@@ -12,9 +12,18 @@ import java.net.Socket;
  * TConnectionHandler - receives requests from the LBs
  */
 public class TConnectionHandler extends Thread{
+    /**
+     * Socket for connections
+     */
     Socket socket;
+    /**
+     * Object Input Stream
+     */
     ObjectInputStream ois;
 
+    /**
+     * Server GUI
+     */
     ServerMainFrame gui;
 
     private final String serverIp;
@@ -74,26 +83,6 @@ public class TConnectionHandler extends Thread{
             System.out.println(req);
 
             Server.addRequest(req);
-
-            /*
-            Request reply = new Request(
-                    req.getClientId(), req.getRequestId(), 2020,
-                    02, req.getNr_iterations(), getPi(req.getNr_iterations(), 5000), req.getDeadline(),
-                    req.getTarget_IP(), req.getTargetPort()
-            );
-            Socket clientSocket = new Socket(req.getTarget_IP(), req.getTargetPort());
-            ObjectOutputStream oosClient = new ObjectOutputStream(clientSocket.getOutputStream());
-            //TODO: change reply with the real serverID and change pi for a double
-            oosClient.writeObject(reply);
-            System.out.println("Reply sent to Client");
-
-            gui.addProcessedRequest(req);
-            gui.removeReceivedRequest(req.getRequestId());
-
-
-            oosClient.close();
-            clientSocket.close();
-            */
         }
 
          else if (req.getCode() == 4) { //receives heartbeat
@@ -113,17 +102,6 @@ public class TConnectionHandler extends Thread{
             oos.close();
 
         }
-    }
-
-
-    /**
-     * Closes the connections
-     * @throws IOException
-     */
-    private void closeConnections() throws IOException {
-//        serverSocket.close();
-        //oos.close();
-        ois.close();
     }
 
     /**

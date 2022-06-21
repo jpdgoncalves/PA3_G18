@@ -10,8 +10,8 @@ import java.awt.*;
 public class MonitorConfigFrame extends JFrame {
     private final JPanel mainPanel = new JPanel();
 
-    private final LabeledTextFieldPanel ipField = new LabeledTextFieldPanel("Client IP: ", "localhost");
-    private final LabeledTextFieldPanel portField = new LabeledTextFieldPanel("Client Port: ", "5056");
+    private final LabeledTextFieldPanel ipField = new LabeledTextFieldPanel("Monitor IP: ", "localhost");
+    private final LabeledTextFieldPanel portField = new LabeledTextFieldPanel("Monitor Port: ", "5056");
     private final BorderButtonPanel startButton = new BorderButtonPanel("Start");
 
     private IStartCallback callback = (ip, port) -> System.out.println(ip + " " + port);

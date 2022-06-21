@@ -22,7 +22,7 @@ public class MonitorMainFrame extends JFrame {
 
     public MonitorMainFrame(int width, int height) {
         super();
-        setTitle("Monitor Configuration");
+        setTitle("Monitor");
         setSize(width, height);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 

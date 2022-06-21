@@ -20,7 +20,7 @@ public class ClientConfigFrame extends JFrame {
 
     public ClientConfigFrame(int width, int height) {
         super();
-        setTitle("Gui.Client Configuration");
+        setTitle("Client Configuration");
         setSize(width, height);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 

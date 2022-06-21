@@ -34,6 +34,14 @@ public class Server {
     private final static ServerMainFrame mainGui = new ServerMainFrame();
     private final static ServerConfigFrame configGui = new ServerConfigFrame();
 
+    /**
+     * Start server
+     * @param ip Server IP
+     * @param port Server port
+     * @param id Server id
+     * @param mIp Client IP
+     * @param mPort Client port
+     */
     public static void startServer(String ip, int port, int id, String mIp, int mPort) {
         Server.ip = ip;
         Server.port = port;
@@ -96,7 +104,11 @@ public class Server {
         }
     }
 
-    public static void main(String[] args) throws IOException { //chain of responsibility to not have like a 1000 diff types threads
+    /**
+     * Server routine
+     * @param args
+     */
+    public static void main(String[] args){ //chain of responsibility to not have like a 1000 diff types threads
 
         //create the request list
         request_list = new PriorityBlockingQueue<>(2, Comparator.comparingInt(Request::getDeadline));

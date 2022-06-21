@@ -42,8 +42,24 @@ public class TConnectionHandler extends Thread{
             System.out.println(req);
             monitorData.addLbRequest(req);
 
-            this.oos = new ObjectOutputStream(socket.getOutputStream());
-            oos.writeObject(monitorData.getServerList());
+            gui.addLbRequest(req);
+            gui.addServerRequest(req);
+
+        }
+
+        //Reply to the request
+        if(req.getCode() == 2 || req.getCode() == 3) {
+            System.out.println("Connection with Server made - receiving reply");
+            System.out.println(req);
+
+            gui.removeServerRequest(req.getRequestId());
+            gui.removeLbRequest(req.getRequestId());
+
+            //send request to LBs
+            for (int i = 0; i < monitorData.getLbList().size(); i++){
+                sendRequest(monitorData.getLbList().get(i).getIp(), monitorData.getLbList().get(i).getPort(), req);
+            }
+
         }
 
         //LB up connection
@@ -77,6 +93,11 @@ public class TConnectionHandler extends Thread{
             monitorData.addServer(new ServerStatus(req.getTarget_IP(), req.getTargetPort(), req.getServerId(),1, 0));
             gui.addServer(req.getServerId(), req.getTarget_IP(), req.getTargetPort());
             gui.setIsServerAlive(req.getServerId(), true);
+
+            //send request to LBs
+            for (int i = 0; i < monitorData.getLbList().size(); i++){
+                sendRequest(monitorData.getLbList().get(i).getIp(), monitorData.getLbList().get(i).getPort(), req);
+            }
         }
 
         if(req.getCode() == 5) {

@@ -1,10 +1,12 @@
 package Messages;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Server state message
+ */
 public class ServerStateMessage implements Serializable {
     //serverId, ServerStatus
     HashMap<Integer, ServerStatus> requestsPerServers = new HashMap<>();
@@ -13,14 +15,27 @@ public class ServerStateMessage implements Serializable {
 
     }
 
+    /**
+     * Add server to list
+     * @param serverId server id
+     * @param status server status
+     */
     public void addServer(int serverId, ServerStatus status){
         requestsPerServers.put(serverId, status);
     }
 
+    /**
+     * Get requests per server
+     * @return requests per server
+     */
     public HashMap<Integer, ServerStatus> getRequestsPerServers(){
         return requestsPerServers;
     }
 
+    /**
+     * Get server with less occupation
+     * @return the Server Status of server with less occupation
+     */
     public ServerStatus getServerWithLessOccupation(){
         ServerStatus serverIdWithLessOccupation = null;
         int numberRequestServer = 25; //higher than the maximum possible for a server

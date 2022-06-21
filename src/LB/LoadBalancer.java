@@ -10,22 +10,29 @@ import java.util.LinkedList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Load Balancer class
+ */
 public class LoadBalancer {
-
     private static String ip;
     private static int port;
     private static int id;
     private static String mIp;
     private static int mPort;
-
     private static final LBMainFrame gui = new LBMainFrame();
-
     private static ServerSocket lbServerSocket;
     private static final ReentrantLock l = new ReentrantLock();
     private static final Condition waitSocket = l.newCondition();
-
     private static LinkedList <Request> listRequests = new LinkedList<>();
 
+    /**
+     * Start Load Balancer
+     * @param ip Load Balancer IP
+     * @param port Load Balancer port
+     * @param id Load Balancer id
+     * @param mIp Monitor IP
+     * @param mPort Monitor port
+     */
     private static void startLb(String ip, int port, int id, String mIp, int mPort) {
         LoadBalancer.ip = ip;
         LoadBalancer.port = port;
@@ -56,6 +63,9 @@ public class LoadBalancer {
         gui.setStopEnabled(true);
     }
 
+    /**
+     * Stop Load Balancer
+     */
     private static void stopLb() {
         try {
             l.lock();
@@ -72,17 +82,24 @@ public class LoadBalancer {
         gui.setStartEnabled(true);
     }
 
+    /**
+     * Adding request to list of requests
+     * @param request
+     */
     public static void addRequest(Request request) {
         listRequests.add(request);
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    /**
+     * Load Balancer routine
+     * @param args
+     */
+    public static void main(String[] args){
         gui.setStartCallback(LoadBalancer::startLb);
         gui.setStopCallback(LoadBalancer::stopLb);
         gui.setStopEnabled(false);
         gui.setStartEnabled(true);
         gui.setVisible(true);
-
 
         while(true){
             l.lock();

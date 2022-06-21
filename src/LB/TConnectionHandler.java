@@ -9,12 +9,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+/**
+ * Load Balancer thread handler
+ */
 public class TConnectionHandler extends Thread{
 
-    Socket socket;
-    ObjectOutputStream oos;
-    ObjectInputStream ois;
-
+    private final Socket socket;
+    private ObjectInputStream ois;
     private final String lbIp;
     private final int lbPort;
     private final String monitorIP;
@@ -23,7 +24,7 @@ public class TConnectionHandler extends Thread{
 
     /**
      * TConnectionHandler constructor
-     * @param socket
+     * @param socket client Socket
      */
     public TConnectionHandler(Socket socket, String ip, int port, String mIp, int mPort){
         this.socket = socket;
@@ -58,7 +59,7 @@ public class TConnectionHandler extends Thread{
             return;
         }
 
-        //TODO: check if connection is from client with this code
+        //request from client
         if(req.getCode() == 1){
             System.out.println("Connection with Client made !!");
 
@@ -78,7 +79,6 @@ public class TConnectionHandler extends Thread{
             socketToMonitor.close();
             oosMonitor.close();
             oisMonitor.close();
-
 
             //this is the server with less occupation
             ServerStatus serverId = serverState.getServerWithLessOccupation();
@@ -100,10 +100,9 @@ public class TConnectionHandler extends Thread{
             }
 
             LoadBalancer.addRequest(req);
-            // oos.flush();
         }
-        //TODO: check if connection is from monitor with this code
-        else if (req.getCode() == 4) { //receives heartbeat
+        //receives Monitor heartbeat
+        else if (req.getCode() == 4) {
             System.out.println("Connection with Monitor made !!");
 
             //send to monitor with my port and IP
@@ -117,9 +116,6 @@ public class TConnectionHandler extends Thread{
 
             //close connection with monitor
             socketToMonitor.close();
-            // oos.flush();
-            // oos.close();
-
         }
 
 
@@ -136,5 +132,4 @@ public class TConnectionHandler extends Thread{
             throw new RuntimeException(e);
         }
     }
-
 }

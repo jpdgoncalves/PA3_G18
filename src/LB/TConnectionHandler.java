@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Load Balancer thread handler
@@ -72,7 +74,7 @@ public class TConnectionHandler extends Thread{
 
             //receives response from monitor
             ObjectInputStream oisMonitor = new ObjectInputStream(socketToMonitor.getInputStream());
-            ServerStateMessage serverState = (ServerStateMessage) oisMonitor.readObject();
+            ArrayList serverState = (ArrayList) oisMonitor.readObject();
             //TODO: make the monitor inform about if there already is a LB running (in this case, the second one will be the secondary)
             System.out.println("I received an answer from the monitor");
             //close connection with monitor
@@ -81,7 +83,7 @@ public class TConnectionHandler extends Thread{
             oisMonitor.close();
 
             //this is the server with less occupation
-            ServerStatus serverId = serverState.getServerWithLessOccupation();
+            ServerStatus serverId = getServerWithLessOccupation(serverState);
             System.out.println("Message to monitor sent\n Now openning connection with server");
             System.out.println("SERVER ID ->" + serverId);
             if (serverId != null) {
@@ -117,8 +119,20 @@ public class TConnectionHandler extends Thread{
             //close connection with monitor
             socketToMonitor.close();
         }
+    }
 
+    private ServerStatus getServerWithLessOccupation(ArrayList<ServerStatus> listServers){
+        ServerStatus serverIdWithLessOccupation = null;
+        int numberRequestServer = 25; //higher than the maximum possible for a server
+        for (ServerStatus serverStatus : listServers){
+            if (serverStatus.getIncompleteRequests().size() < numberRequestServer) {
+                serverIdWithLessOccupation = serverStatus;
+                numberRequestServer = serverStatus.getIncompleteRequests().size();
+                break;
+            }
+        }
 
+        return serverIdWithLessOccupation;
     }
 
     /**

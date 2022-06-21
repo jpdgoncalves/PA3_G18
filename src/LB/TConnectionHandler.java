@@ -112,6 +112,7 @@ public class TConnectionHandler extends Thread{
                     lbIp, lbPort
             ));
 
+
             //close connection with monitor
             socketToMonitor.close();
         }

@@ -2,7 +2,6 @@ package Server;
 
 import Gui.Server.ServerMainFrame;
 import Messages.Request;
-import Messages.ServerStateMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -14,7 +13,6 @@ import java.net.Socket;
  */
 public class TConnectionHandler extends Thread{
     Socket socket;
-    //ObjectOutputStream oos;
     ObjectInputStream ois;
 
     ServerMainFrame gui;
@@ -53,7 +51,6 @@ public class TConnectionHandler extends Thread{
      */
     private void startConnection() throws IOException, ClassNotFoundException {
         this.ois = new ObjectInputStream(socket.getInputStream());
-        //this.oos = new ObjectOutputStream(socket.getOutputStream());
 
         Request req = (Request) ois.readObject();
         System.out.println("I got a request - " + req.getCode());
@@ -64,7 +61,6 @@ public class TConnectionHandler extends Thread{
             System.out.println("Client " + this.socket + " sends exit...");
             System.out.println("Connection closing...");
             this.socket.close();
-            //this.oos.close();
             this.ois.close();
             System.out.println("Closed");
             gui.addProcessedRequest(req);
@@ -118,31 +114,6 @@ public class TConnectionHandler extends Thread{
             oos.close();
 
         }
-
-        //LB up connection
-        /*if(req.getCode() == 6){
-            System.out.println("Connection with LB made - LB up!!");
-            Server.addRequest(req);
-            System.out.println(req);
-            //oos.flush();
-        }
-
-
-        //Server up connection
-        if (req.getCode() == 7) {
-            System.out.println("Connection with Server made - server up!!");
-            Server.addRequest(req);
-            System.out.println(req);
-            //oos.flush();
-        }
-
-        //Heartbeat reply
-        if(req.getCode() == 5){
-            System.out.println("Heartbeat received!!");
-            Server.addRequest(req);
-            System.out.println(req);
-            //oos.flush();
-        }*/
     }
 
 

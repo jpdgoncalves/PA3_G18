@@ -28,10 +28,19 @@ public class ServerMainFrame extends JFrame {
     );
     private final FooterPanel footerPanel = new FooterPanel();
 
+    /**
+     * Constructor of ServerMainFrame
+     */
     public ServerMainFrame() {
         this(1000, 800);
     }
 
+    /**
+     * Constructor of ServerMainFrame
+     *
+     * @param width width of the frame
+     * @param height height of the frame
+     */
     public ServerMainFrame(int width, int height) {
         super();
         setTitle("Server");
@@ -47,34 +56,66 @@ public class ServerMainFrame extends JFrame {
         add(mainPanel);
     }
 
+    /**
+     * Sets the ip
+     * @param ip ip to be set
+     */
     public void setIp(String ip) {
         footerPanel.setIp(ip);
     }
 
+    /**
+     * Sets the port
+     * @param port port to be set
+     */
     public void setPort(int port) {
         footerPanel.setPort("" + port);
     }
 
+    /**
+     * Sets the id
+     * @param id id to be set
+     */
     public void setId(int id) {
         footerPanel.setId("" + id);
     }
 
+    /**
+     * Sets the stop callback
+     * @param callback callback
+     */
     public void setStopCallback(IStopCallback callback) {
         footerPanel.setStopCallback(callback);
     }
 
+    /**
+     * Adds a received request
+     * @param request request to add
+     */
     public void addReceivedRequest(Request request) {
         receivedPanel.addRequest(request);
     }
 
+    /**
+     * Removes a received request given its id
+     * @param requestId id of the request to remove
+     */
     public void removeReceivedRequest(int requestId) {
         receivedPanel.removeRequest(requestId);
     }
 
+    /**
+     * Adds a processed request
+     * @param request request to add
+     */
     public void addProcessedRequest(Request request) {
         processedPanel.addRequest(request);
     }
 
+    /**
+     * Removes a processed request
+     * @param requestId id of the request to remove
+     */
     public void removeProcessedRequest(int requestId) {
         processedPanel.removeRequest(requestId);
     }

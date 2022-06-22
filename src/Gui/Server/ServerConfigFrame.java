@@ -9,7 +9,6 @@ import java.awt.*;
 
 public class ServerConfigFrame extends JFrame {
     private final JPanel mainPanel = new JPanel();
-
     private final LabeledTextFieldPanel ipField = new LabeledTextFieldPanel("Server IP:", "localhost");
     private final LabeledTextFieldPanel portField = new LabeledTextFieldPanel("Server Port:", "5058");
     private final LabeledTextFieldPanel idField = new LabeledTextFieldPanel("Server ID:", "1");
@@ -18,14 +17,26 @@ public class ServerConfigFrame extends JFrame {
 
     private final BorderButtonPanel startButton = new BorderButtonPanel("Start");
 
+    /**
+     * Defines callback
+     */
     private IStartCallback callback = (ip, port, id, mIp, mPort) -> {
         System.out.println(ip + " " + port + " " + id + " " + mIp + " " + mPort);
     };
 
+    /**
+     * Constructor of ServerConfigFrame
+     */
     public ServerConfigFrame() {
         this(500, 500);
     }
 
+    /**
+     * Constructor of ServerConfigFrame
+     *
+     * @param width width of the frame
+     * @param height height of the frame
+     */
     public ServerConfigFrame(int width, int height) {
         super();
         setTitle("Server Configuration");
@@ -42,7 +53,6 @@ public class ServerConfigFrame extends JFrame {
         // Box layout respects the maximum size and nothing else
         startButton.setMaximumSize(new Dimension(200, 70));
         startButton.addActionListener((e) -> {
-            //TODO - fix button
             startButton.setEnabled(false);
             int port = Integer.parseInt(portField.getValue());
             int id = Integer.parseInt(idField.getValue());
@@ -66,6 +76,10 @@ public class ServerConfigFrame extends JFrame {
         add(mainPanel);
     }
 
+    /**
+     * Sets start callback
+     * @param callback callback
+     */
     public void setStartCallback(IStartCallback callback) {
         this.callback = callback;
     }

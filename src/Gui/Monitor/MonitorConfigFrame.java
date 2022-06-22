@@ -7,6 +7,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * The configuration interface for the monitor.
+ */
 public class MonitorConfigFrame extends JFrame {
     private final JPanel mainPanel = new JPanel();
 
@@ -16,10 +19,20 @@ public class MonitorConfigFrame extends JFrame {
 
     private IStartCallback callback = (ip, port) -> System.out.println(ip + " " + port);
 
+    /**
+     * Creates a new configuration interface
+     * with the default sizes.
+     */
     public MonitorConfigFrame() {
         this(500, 500);
     }
 
+    /**
+     * Creates a new configuration interface
+     * with the specified size.
+     * @param width Width in pixels.
+     * @param height Height in pixels.
+     */
     public MonitorConfigFrame(int width, int height) {
         super();
         setTitle("Monitor Configuration");
@@ -48,6 +61,10 @@ public class MonitorConfigFrame extends JFrame {
         add(mainPanel);
     }
 
+    /**
+     * Set the callback for when the start button is pressed.
+     * @param callback The callback for start button press.
+     */
     public void setStartCallback(IStartCallback callback) {
         this.callback = callback;
     }

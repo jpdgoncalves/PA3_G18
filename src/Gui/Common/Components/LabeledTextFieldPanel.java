@@ -4,6 +4,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * Simple Text field with label on the right component.
+ */
 public class LabeledTextFieldPanel extends JPanel {
     private final JLabel label = new JLabel();
     private final JTextField textField = new JTextField();
@@ -27,14 +30,26 @@ public class LabeledTextFieldPanel extends JPanel {
         add(textField);
     }
 
+    /**
+     * Gets the value in the text field.
+     * @return The value in the text field.
+     */
     public String getValue() {
         return textField.getText();
     }
 
+    /**
+     * Sets the value in the text field.
+     * @param value The value to display.
+     */
     public void setValue(String value) {
         textField.setText(value);
     }
 
+    /**
+     * Enable or disables the text field for edition.
+     * @param editable Whether the text field is editable or not.
+     */
     public void setEditable(boolean editable) {
         textField.setEditable(editable);
     }

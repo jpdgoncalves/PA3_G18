@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+/**
+ * Tab that displays the requests.
+ */
 class RequestsTab extends JPanel {
     private final JPanel contentPanel = new JPanel();
     private final JScrollPane scroller = new JScrollPane(contentPanel);
@@ -23,6 +26,9 @@ class RequestsTab extends JPanel {
     private final HashMap<Integer, RequestTablePanel> serverTableMapper = new HashMap<>();
     private final HashMap<Integer, Integer> requestIdToServer = new HashMap<>();
 
+    /**
+     * Creates a new requests tab.
+     */
     public RequestsTab() {
         super();
         setLayout(new GridLayout(1, 1));
@@ -34,10 +40,20 @@ class RequestsTab extends JPanel {
         add(scroller);
     }
 
+    /**
+     * Tests whether the tab is already displaying
+     * a certain server.
+     * @param id The id of the server.
+     * @return Whether the server is being displayed.
+     */
     public boolean hasServer(int id) {
         return serverTableMapper.containsKey(id);
     }
 
+    /**
+     * Adds a server ot the interface.
+     * @param id Id of the server.
+     */
     public void addServer(int id) {
         SwingUtilities.invokeLater(() -> {
             if (hasServer(id)) return;
@@ -57,6 +73,10 @@ class RequestsTab extends JPanel {
         });
     }
 
+    /**
+     * Remove a server from the interface.
+     * @param id The server to remove.
+     */
     public void removeServer(int id) {
         SwingUtilities.invokeLater(() -> {
             if (!hasServer(id)) return;
@@ -81,6 +101,10 @@ class RequestsTab extends JPanel {
         }
     }
 
+    /**
+     * Adds a server request that is being processed.
+     * @param request The request to add.
+     */
     public void addServerRequest(Request request) {
         SwingUtilities.invokeLater(() -> {
             if (!hasServer(request.getServerId())) return;
@@ -91,6 +115,10 @@ class RequestsTab extends JPanel {
         });
     }
 
+    /**
+     * Removes a request being processed by a server.
+     * @param requestId The id of the request.
+     */
     public void removeServerRequest(int requestId) {
         SwingUtilities.invokeLater(() -> {
             if (!requestIdToServer.containsKey(requestId)) return;
@@ -105,10 +133,18 @@ class RequestsTab extends JPanel {
         });
     }
 
+    /**
+     * Adds a load balancer managed request.
+     * @param request The request to add.
+     */
     public void addLbRequest(Request request) {
         lbPanel.addRequest(request);
     }
 
+    /**
+     * Removes a request being managed by the lb.
+     * @param requestId The id of the request.
+     */
     public void removeLbRequest(int requestId) {
         lbPanel.removeRequest(requestId);
     }

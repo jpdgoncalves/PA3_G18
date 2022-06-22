@@ -7,6 +7,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * Client Configuration interface
+ */
 public class ClientConfigFrame extends JFrame {
     private final JPanel mainPanel = new JPanel();
     private final LabeledTextFieldPanel ipField = new LabeledTextFieldPanel("Client IP: ", "localhost");
@@ -14,10 +17,20 @@ public class ClientConfigFrame extends JFrame {
     private final LabeledTextFieldPanel idField = new LabeledTextFieldPanel("Client ID: ", "99");
     private IStartCallback callback = (ip, port, id) -> System.out.println(ip + " " + port + " " + id);
 
+    /**
+     * Creates a new client configuration interface
+     * with the default width and height.
+     */
     public ClientConfigFrame() {
         this(500, 500);
     }
 
+    /**
+     * Creates a new client configuration interface
+     * with the specified width and height.
+     * @param width Width of the interface in pixels.
+     * @param height Height of the interface in pixels.
+     */
     public ClientConfigFrame(int width, int height) {
         super();
         setTitle("Client Configuration");
@@ -54,6 +67,11 @@ public class ClientConfigFrame extends JFrame {
         add(mainPanel);
     }
 
+    /**
+     * Set a callback function for when the start
+     * button is pressed.
+     * @param callback The function to be called when the button is pressed.
+     */
     public void setStartCallback(IStartCallback callback) {
         this.callback = callback;
     }

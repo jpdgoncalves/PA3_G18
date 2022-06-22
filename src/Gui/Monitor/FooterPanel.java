@@ -8,6 +8,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * Component that appears at the bottom
+ * of the Monitor Main interface. It displays the
+ * ip address, port number as well as a stop button,
+ * intended to reopen the configuration interface.
+ */
 public class FooterPanel extends JPanel {
     private final LabeledTextFieldPanel ipField = new LabeledTextFieldPanel("IP:", "");
     private final LabeledTextFieldPanel portField = new LabeledTextFieldPanel("Port:", "");
@@ -15,6 +21,9 @@ public class FooterPanel extends JPanel {
 
     private IStopCallback callback = () -> System.out.println("Stop clicked");
 
+    /**
+     * Instantiates a new footer component.
+     */
     public FooterPanel() {
         super();
         setLayout(new GridLayout(1, 4));
@@ -33,14 +42,26 @@ public class FooterPanel extends JPanel {
         add(stopButton);
     }
 
+    /**
+     * Sets the ip to be displayed.
+     * @param ip The ip to be displayed.
+     */
     public void setIp(String ip) {
         ipField.setValue(ip);
     }
 
+    /**
+     * Sets the port number to be displayed.
+     * @param port The port number to be displayed.
+     */
     public void setPort(int port) {
         portField.setValue("" + port);
     }
 
+    /**
+     * Sets the callback for when the stop button is pressed.
+     * @param callback callback for stop button press.
+     */
     public void setStopCallback(IStopCallback callback) {
         this.callback = callback;
     }

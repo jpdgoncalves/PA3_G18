@@ -1,4 +1,4 @@
 /**
- * TODO - Contains components shared by the GUIs
+ * Contains components and interfaces shared by the GUIs
  */
 package Gui.Common;

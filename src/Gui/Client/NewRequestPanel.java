@@ -6,6 +6,10 @@ import Gui.Common.Components.TitledPanel;
 
 import java.awt.*;
 
+/**
+ * New Request Panel Component. This
+ * is where the use makes new request.
+ */
 public class NewRequestPanel extends TitledPanel {
     private final LabeledTextFieldPanel ipField = new LabeledTextFieldPanel("IP: ", "localhost");
     private final LabeledTextFieldPanel portField = new LabeledTextFieldPanel("Port: ", "22222");
@@ -17,6 +21,9 @@ public class NewRequestPanel extends TitledPanel {
     );
     private ISendCallback callback = (ip, port, ni, deadline) -> System.out.println(ip + " " + port + " " + ni + " " + deadline);
 
+    /**
+     * Creates a new instance of the request panel component.
+     */
     public NewRequestPanel() {
         super("New Request: ");
         setLayout(new GridLayout(3,2));
@@ -40,6 +47,10 @@ public class NewRequestPanel extends TitledPanel {
         add(sendButton);
     }
 
+    /**
+     * Sets the callback for the send button press.
+     * @param callback The call for the send button press.
+     */
     public void setSendCallback(ISendCallback callback) {
         this.callback = callback;
     }
